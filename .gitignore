@@ -23,3 +23,8 @@ tool/spike/clips/
 # Secrets
 .env
 *.token
+
+# On-device models: fetched and verified by tool/fetch_models.py
+assets/models/*.onnx
+assets/models/tokens.txt
+assets/models/ASR_LICENSE.txt

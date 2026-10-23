@@ -1,4 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Recite: the teacher listens on the phone. Audio is never uploaded. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Audio and model downloads only. No analytics. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="rattil"
         android:name="${applicationName}"

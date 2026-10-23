@@ -60,7 +60,8 @@ class _Step {
 /// decides its result, so a reader who repeats to fix a mistake is not
 /// penalized.
 class Aligner {
-  Aligner(this.stream, {this.config = const TeacherConfig(), Map<int, List<String>>? variants})
+  Aligner(this.stream,
+      {this.config = const TeacherConfig(), Map<int, List<String>>? variants, this.freeLengthUnits = const {}})
       : scorer = UnitScorer(config),
         _variants = {
           for (final e in (variants ?? const <int, List<String>>{}).entries)
@@ -70,6 +71,10 @@ class Aligner {
   final ExpectedStream stream;
   final TeacherConfig config;
   final UnitScorer scorer;
+
+  /// Long vowels whose length is the reader's free choice (madd aarid at an
+  /// ayah end). A length difference there is not reported.
+  final Set<int> freeLengthUnits;
 
   /// Alternative pronunciations per word (wasl forms at ayah boundaries).
   final Map<int, List<List<PUnit>>> _variants;
@@ -325,6 +330,12 @@ class Aligner {
       if (complete && !skipped && _variants.containsKey(word)) {
         final segEnd = trailingHypEnd[k] > he ? trailingHypEnd[k] : he;
         finalIssues = _bestVariant(word, issues, hyp, hs, segEnd, u0 + s);
+      }
+      if (freeLengthUnits.isNotEmpty) {
+        finalIssues = [
+          for (final i in finalIssues)
+            if (!(i.type == IssueType.maddLength && freeLengthUnits.contains(i.expectedUnit))) i,
+        ];
       }
 
       final WordStatus status;

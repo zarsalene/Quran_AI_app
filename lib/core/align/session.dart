@@ -2,6 +2,7 @@ import 'aligner.dart';
 import 'compare.dart';
 import 'config.dart';
 import 'models.dart';
+import 'phonetics.dart';
 import 'units.dart';
 
 enum TeacherMode {
@@ -66,7 +67,7 @@ class TeacherSession {
     Map<int, List<String>>? variants,
     this.windowWords = 40,
     this.trimAfterWords = 8,
-  })  : aligner = Aligner(stream, config: config, variants: variants),
+  })  : aligner = Aligner(stream, config: config, variants: variants, freeLengthUnits: ayahEndMadd(stream, wordAyah)),
         _scorer = UnitScorer(config),
         _windowStart = rangeStart;
 
@@ -126,8 +127,16 @@ class TeacherSession {
     if (all.length <= _hypOffset) return const [];
     _hyp = all.sublist(_hypOffset);
 
-    final windowEnd = (_firstOpen() + windowWords).clamp(0, stream.wordCount);
-    final r = aligner.align(_hyp, fromWord: _windowStart, toWord: windowEnd, atPause: atPause);
+    // If the reader got to the end of the window, the window was too small
+    // (a large batch of audio): widen it, or the unmatched rest would look
+    // like a jump.
+    var windowEnd = (_firstOpen() + windowWords).clamp(0, stream.wordCount);
+    var r = aligner.align(_hyp, fromWord: _windowStart, toWord: windowEnd, atPause: atPause);
+    bool reachedEnd(AlignmentResult r) => r.words.reversed.take(2).any((w) => w.hypStart >= 0);
+    while (windowEnd < stream.wordCount && reachedEnd(r)) {
+      windowEnd = (windowEnd + windowWords).clamp(0, stream.wordCount);
+      r = aligner.align(_hyp, fromWord: _windowStart, toWord: windowEnd, atPause: atPause);
+    }
 
     final jump = _checkJump(r);
     if (jump != null) return [jump];
@@ -325,6 +334,22 @@ class TeacherSession {
   }
 
   static const _jumpRun = 3;
+
+  /// The last long vowel of each ayah's last word: madd aarid, whose length
+  /// (2, 4 or 6) the reader chooses when stopping.
+  static Set<int> ayahEndMadd(ExpectedStream stream, List<int> wordAyah) {
+    final units = <int>{};
+    for (var w = 0; w < stream.wordCount; w++) {
+      if (w + 1 < stream.wordCount && wordAyah[w + 1] == wordAyah[w]) continue;
+      for (var u = stream.wordEnd(w) - 1; u >= stream.wordStart(w); u--) {
+        if (stream.units[u].kind == UnitKind.longVowel) {
+          units.add(u);
+          break;
+        }
+      }
+    }
+    return units;
+  }
 
   static bool _wasRead(WordResult? r) =>
       r != null && r.status != WordStatus.pending && r.status != WordStatus.skipped;

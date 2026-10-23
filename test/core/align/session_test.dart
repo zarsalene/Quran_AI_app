@@ -140,6 +140,20 @@ void main() {
     expect(s.results, isEmpty);
   });
 
+  test('a whole long ayah in one update is not mistaken for a jump', () {
+    final s = TeacherSession(
+      stream: ExpectedStream(words),
+      rangeStart: a3,
+      rangeEnd: words.length,
+      wordAyah: ayahOf,
+      windowWords: 10,
+    );
+    final text = words.sublist(a3).join();
+    final events = [...s.update(text, atPause: true), ...s.update(text, atPause: true)];
+    expect(events.whereType<JumpEvent>(), isEmpty);
+    expect(events.whereType<FinishedEvent>().single.perfect, isTrue);
+  });
+
   test('a long range stays correct while the window moves forward', () {
     final s = session(a3, words.length);
     final events = feed(s, words.sublist(a3).join(), chunk: 10);
