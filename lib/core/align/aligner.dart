@@ -74,7 +74,10 @@ class Aligner {
   /// Alternative pronunciations per word (wasl forms at ayah boundaries).
   final Map<int, List<List<PUnit>>> _variants;
 
-  AlignmentResult align(List<PUnit> hyp, {int fromWord = 0, int? toWord}) {
+  /// [atPause] is true when the reader has stopped speaking (VAD silence).
+  /// A word that is only partly matched is then judged as finished, so a
+  /// wrong last letter is reported instead of waiting forever.
+  AlignmentResult align(List<PUnit> hyp, {int fromWord = 0, int? toWord, bool atPause = false}) {
     final w0 = fromWord, w1 = toWord ?? stream.wordCount;
     final u0 = stream.wordStart(w0);
     final e = stream.units.sublist(u0, stream.wordEnd(w1 - 1));
@@ -145,9 +148,19 @@ class Aligner {
     }
 
     // The reader may stop anywhere: the end is the cheapest expected position.
+    // On a tie, prefer the further position (the reader made progress).
     var pEnd = 0;
     for (var p = 1; p <= n; p++) {
-      if (cost[t1 * cols + p] < cost[t1 * cols + pEnd]) pEnd = p;
+      if (cost[t1 * cols + p] <= cost[t1 * cols + pEnd]) pEnd = p;
+    }
+    if (atPause) {
+      for (var k = 0; k < starts.length; k++) {
+        final end = k + 1 < starts.length ? starts[k + 1] : n;
+        if (starts[k] < pEnd && pEnd < end) {
+          pEnd = end;
+          break;
+        }
+      }
     }
 
     final steps = <_Step>[];
