@@ -1,0 +1,25 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+android/.gradle/
+android/local.properties
+android/app/*.jks
+android/key.properties
+
+# Python tools
+.venv/
+__pycache__/
+
+# Downloaded data and models (rebuilt by scripts, pinned in data/CHECKSUMS)
+data/raw/
+tool/spike/model/
+tool/spike/clips/
+
+# Secrets
+.env
+*.token

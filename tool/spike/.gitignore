@@ -1,0 +1,4 @@
+.venv/
+model/
+clips/
+spike_out.txt

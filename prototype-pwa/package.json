@@ -1,0 +1,10 @@
+{
+  "name": "iqra-quran-learning-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline-capable mobile web prototype for a careful Quran learning app",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}
