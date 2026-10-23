@@ -3,3 +3,6 @@
 *.ttf binary
 *.onnx binary
 *.db binary
+*.sqlite binary
+# Source data must stay byte-exact: data/CHECKSUMS pins it.
+data/raw/** -text

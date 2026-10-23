@@ -15,8 +15,8 @@ android/key.properties
 .venv/
 __pycache__/
 
-# Downloaded data and models (rebuilt by scripts, pinned in data/CHECKSUMS)
-data/raw/
+# data/raw/ is committed on purpose: QUL needs a login, so CI cannot download it.
+# Every file there is pinned in data/CHECKSUMS.
 tool/spike/model/
 tool/spike/clips/
 
