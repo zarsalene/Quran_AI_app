@@ -2,11 +2,11 @@
 
 Full spec: [AGENT_PROMPT.md](AGENT_PROMPT.md). Each slice ends with `flutter analyze`, `flutter test`, and a green CI APK build.
 
-## 0. Spike (now)
-- [x] Reference phonemes from `quran-transcript` for 5 clips (1:1, 1:7, 2:255, 112:1, 114:6). Text comes from the package data, not typed.
-- [ ] Run `Quran-Lab/zipformer_p-arabic-v3` int8 ONNX (sherpa-onnx, streaming CTC) on the 5 clips. **Blocked: HF access waits for manual approval.**
-- [ ] Confirm the model's `tokens.txt` alphabet matches `quran-transcript`. If not, write and test a mapping.
-- Fallback if refused: `muaalem-model-v3_2` (MIT, 2.4 GB fp32, too big for 2–3 GB phones) or `whisper-base-ar-quran` (word-level only).
+## 0. Spike: done with v2 (see tool/spike/SPIKE_REPORT_v2.md)
+- [x] Reference phonemes from `quran-transcript` for 5 clips. Text comes from the package data, not typed.
+- [x] `zipformer_p-arabic-v2` int8 (public mirror, NPL-1.1) runs in sherpa-onnx: 2.86% character error, 4-6x faster than real time on a PC.
+- [x] Alphabet: tokens.txt and quran-transcript have the same 42 characters. No mapping needed.
+- [ ] v3 (gated, waiting for approval): same interface, swap when approved. Expected fewer false stops (v2: 2 of 66 words).
 
 ## 1. Data pipeline + integrity gate (`tool/data`, Python)
 - Download QUL Hafs text + KFGQPC font, QUL Mushaf layout, QUL word segments, Tanzil Uthmani, metadata.

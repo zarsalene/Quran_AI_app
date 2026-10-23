@@ -2,11 +2,13 @@
 
 Usage (from tool/spike):
     .venv/Scripts/hf.exe auth login                    # once, after HF approves access
-    .venv/Scripts/python.exe -I -X utf8 spike.py       # runs the ASR model if a token exists
+    .venv/Scripts/python.exe -I -X utf8 spike.py --model v3   # gated, needs approval
+    .venv/Scripts/python.exe -I -X utf8 spike.py --model v2   # public mirror
 
 The Quran text comes from the quran-transcript package data. Nothing is typed here.
 """
 
+import dataclasses
 import json
 import os
 import sys
@@ -22,11 +24,16 @@ from quran_transcript import Aya, MoshafAttributes, alphabet, quran_phonetizer
 HERE = Path(__file__).parent
 CLIPS_DIR = HERE / "clips"
 MODEL_DIR = HERE / "model"
-REPORT = HERE / "SPIKE_REPORT.md"
-
-MODEL_REPO = "Quran-Lab/zipformer_p-arabic-v3"
-MODEL_FILE = "zipformer_p_arabic_v3.int8.onnx"
+# Pick a model with --model. v3 is gated (manual approval). v2 is an
+# unmodified public mirror of Muno459/zipformer_p-arabic-v2 (NPL-1.1).
+MODELS = {
+    "v3": ("Quran-Lab/zipformer_p-arabic-v3", "zipformer_p_arabic_v3.int8.onnx"),
+    "v2": ("swaraadam/quran-phoneme-zipformer", "model.int8.onnx"),
+}
+MODEL_NAME = sys.argv[sys.argv.index("--model") + 1] if "--model" in sys.argv else "v3"
+MODEL_REPO, MODEL_FILE = MODELS[MODEL_NAME]
 TOKENS_FILE = "tokens.txt"
+REPORT = HERE / f"SPIKE_REPORT_{MODEL_NAME}.md"
 RECITER = "Alafasy_64kbps"
 
 # (surah, ayah): short, long, and edge cases (basmala ayah, last ayah of the mushaf).
@@ -61,17 +68,18 @@ def fetch_clip(surah: int, ayah: int) -> np.ndarray:
 
 
 def fetch_model() -> tuple[Path, Path] | None:
-    model, tokens = MODEL_DIR / MODEL_FILE, MODEL_DIR / TOKENS_FILE
+    model_dir = MODEL_DIR / MODEL_NAME
+    model, tokens = model_dir / MODEL_FILE, model_dir / TOKENS_FILE
     if model.exists() and tokens.exists():
         return model, tokens
     from huggingface_hub import get_token, hf_hub_download
 
     token = os.environ.get("HF_TOKEN") or get_token()
-    if not token:
+    if not token and MODEL_NAME == "v3":
         return None
 
-    for name in (MODEL_FILE, TOKENS_FILE):
-        hf_hub_download(MODEL_REPO, name, local_dir=MODEL_DIR, token=token)
+    for name in (MODEL_FILE, TOKENS_FILE, "LICENSE"):
+        hf_hub_download(MODEL_REPO, name, local_dir=model_dir, token=token)
     return model, tokens
 
 
@@ -121,6 +129,7 @@ def main() -> int:
     ref_chars: set[str] = set()
     hyp_chars: set[str] = set()
     total_err = total_len = 0
+    hyps: dict[str, str] = {}
     for surah, ayah in CLIPS:
         uthmani, words, ref = reference(surah, ayah)
         ref_chars.update(ref)
@@ -130,6 +139,7 @@ def main() -> int:
             t0 = time.perf_counter()
             hyp = recognize(rec, samples).replace(" ", "")
             rtf = (time.perf_counter() - t0) / (len(samples) / 16000)
+            hyps[f"{surah}:{ayah}"] = hyp
             hyp_chars.update(hyp)
             err = edit_distance(ref, hyp)
             total_err += err
@@ -140,16 +150,20 @@ def main() -> int:
         lines += [block[0], "", "```", *block[2:-1], "```", ""]
 
     if rec:
+        alpha = {getattr(alphabet.phonetics, f.name) for f in dataclasses.fields(alphabet.phonetics)}
+        alpha_chars = {c for s in alpha for c in s}
         lines += [
             "## Alphabet check",
             "",
             f"- Overall character error rate vs reference: {100 * total_err / total_len:.2f}%",
-            f"- Characters in model output not in reference alphabet: {sorted(hyp_chars - ref_chars - token_chars) or 'none'}",
-            f"- Reference characters missing from model tokens.txt: {sorted(ref_chars - token_chars) or 'none'}",
-            f"- Model token characters not seen in the 5 references: {len(token_chars - ref_chars)}",
+            f"- quran-transcript phonetic alphabet: {len(alpha_chars)} characters",
+            f"- Model tokens.txt characters not in that alphabet: {sorted(token_chars - alpha_chars) or 'none'}",
+            f"- Alphabet characters missing from tokens.txt: {sorted(alpha_chars - token_chars) or 'none'}",
+            f"- Characters in model output not in that alphabet: {sorted(hyp_chars - alpha_chars) or 'none'}",
         ]
-        print("\n".join(lines[-5:]))
+        print("\n".join(lines[-6:]))
         REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        (HERE / f"hyp_{MODEL_NAME}.json").write_text(json.dumps(hyps, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"\nWrote {REPORT}")
 
     # Save the per-word reference so the Dart aligner tests can reuse it.
