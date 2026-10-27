@@ -40,10 +40,18 @@ jobs:
           --build-number ${{ github.run_number }}
           --dart-define=APP_VERSION=0.2.${{ github.run_number }}
 
+      # Friendly file names. No version in the name, so the link
+      # releases/latest/download/Rattil.apk never changes.
+      - name: Name the APKs
+        run: |
+          mkdir dist
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk dist/Rattil.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk dist/Rattil-32bit.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: rattil-apks
-          path: build/app/outputs/flutter-apk/*.apk
+          path: dist/*.apk
           if-no-files-found: error
 
       # Direct download for testers: each build on main becomes a release, and
@@ -56,10 +64,10 @@ jobs:
           name: Rattil 0.2.${{ github.run_number }}
           target_commitish: ${{ github.sha }}
           make_latest: true
-          files: build/app/outputs/flutter-apk/*.apk
+          files: dist/*.apk
           body: |
             Test build ${{ github.run_number }} (commit ${{ github.sha }}).
 
-            Install: download `app-arm64-v8a-release.apk` (most phones) or `app-armeabi-v7a-release.apk` (older 32-bit phones), open it, and allow "Install unknown apps" if Android asks.
+            Install: download `Rattil.apk` (most phones) or `Rattil-32bit.apk` (older phones), open it, and allow "Install unknown apps" if Android asks.
 
             Automatic feedback can be wrong. It does not replace a qualified teacher.

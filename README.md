@@ -10,9 +10,10 @@ Status: in development. See [PLAN.md](PLAN.md).
 
 ## Install on a phone
 
-1. Open the latest green run on the [Actions page](https://github.com/zarsalene/Quran_AI_app/actions) and download the `rattil-apks` artifact.
-2. Unzip it. Pick `app-arm64-v8a-release.apk` (most phones from 2017 and later) or `app-armeabi-v7a-release.apk` (older 32-bit phones).
-3. Copy the APK to the phone and open it. Allow "Install unknown apps" for your file manager when Android asks.
+1. On the phone, open https://github.com/zarsalene/Quran_AI_app/releases/latest/download/Rattil.apk
+   (for an older 32-bit phone: `Rattil-32bit.apk` on the [latest release](https://github.com/zarsalene/Quran_AI_app/releases/latest)).
+2. Open the downloaded file and tap Install. Allow "Install unknown apps" if Android asks.
+3. Open Rattil (رتّل). The version is shown at the top right of the home screen.
 
 ## Build locally (command line, no Android Studio)
 
