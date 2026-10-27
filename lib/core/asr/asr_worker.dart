@@ -16,12 +16,17 @@ class AsrPaths {
 /// One update from the worker after a block of audio.
 class AsrUpdate {
   const AsrUpdate({
+    required this.attempt,
     required this.text,
     required this.speaking,
     required this.silenceMs,
     required this.noisy,
     required this.decodeMs,
   });
+
+  /// Which attempt this belongs to (see [AsrWorker.reset]). Updates of an
+  /// older attempt may still arrive after a reset and must be ignored.
+  final int attempt;
 
   /// Full phoneme text of the current attempt (since the last reset).
   final String text;
@@ -48,7 +53,8 @@ class _Audio extends _Cmd {
 }
 
 class _Reset extends _Cmd {
-  const _Reset();
+  const _Reset(this.attempt);
+  final int attempt;
 }
 
 class _Stop extends _Cmd {
@@ -80,8 +86,8 @@ class AsrWorker {
   /// Raw mic bytes: 16 kHz, mono, 16-bit little-endian PCM.
   void addAudio(Uint8List pcm16) => _send.send(_Audio(pcm16));
 
-  /// Starts a new attempt: the next updates contain only new speech.
-  void reset() => _send.send(const _Reset());
+  /// Starts attempt [attempt]: the next updates contain only new speech.
+  void reset(int attempt) => _send.send(_Reset(attempt));
 
   void dispose() {
     _send.send(const _Stop());
@@ -121,6 +127,7 @@ class AsrWorker {
     final meter = NoiseMeter();
     var silenceMs = 0;
     var text = '';
+    var attempt = 0;
 
     final inbox = ReceivePort();
     out.send(inbox.sendPort);
@@ -143,13 +150,15 @@ class AsrWorker {
           }
           text = recognizer.getResult(stream).text;
           out.send(AsrUpdate(
+            attempt: attempt,
             text: text,
             speaking: speaking,
             silenceMs: silenceMs,
             noisy: meter.isNoisy,
             decodeMs: sw.elapsedMilliseconds,
           ));
-        case _Reset():
+        case _Reset(attempt: final next):
+          attempt = next;
           stream.free();
           stream = recognizer.createStream();
           vad.reset();

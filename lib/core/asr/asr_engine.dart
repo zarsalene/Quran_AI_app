@@ -40,7 +40,11 @@ class AsrEngine {
     return AsrEngine._(worker);
   }
 
-  Future<bool> hasMicPermission() => _recorder.hasPermission();
+  /// True if the mic is already allowed. Never shows the system prompt.
+  Future<bool> micAllowed() => _recorder.hasPermission(request: false);
+
+  /// Shows the system prompt if needed. Explain why before calling this.
+  Future<bool> requestMic() => _recorder.hasPermission();
 
   /// Starts listening. Call [reset] first to begin a new attempt.
   Future<void> listen() async {
@@ -63,7 +67,8 @@ class AsrEngine {
     await _recorder.stop();
   }
 
-  void reset() => _worker.reset();
+  /// Starts a new attempt. Updates carry this number.
+  void reset(int attempt) => _worker.reset(attempt);
 
   Future<void> dispose() async {
     await pause();

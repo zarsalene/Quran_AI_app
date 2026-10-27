@@ -67,13 +67,16 @@ class TeacherSession {
     Map<int, List<String>>? variants,
     this.windowWords = 40,
     this.trimAfterWords = 8,
+    int? startWord,
   })  : aligner = Aligner(stream, config: config, variants: variants, freeLengthUnits: ayahEndMadd(stream, wordAyah)),
         _scorer = UnitScorer(config),
-        _windowStart = rangeStart;
+        _windowStart = startWord ?? rangeStart;
 
   final ExpectedStream stream;
 
-  /// Words [rangeStart, rangeEnd) are the ones the reader chose.
+  /// Words [rangeStart, rangeEnd) are the ones the reader chose and the only
+  /// ones judged. Words before rangeStart from `startWord` on (the basmala)
+  /// may be recited or left out.
   final int rangeStart;
   final int rangeEnd;
 
