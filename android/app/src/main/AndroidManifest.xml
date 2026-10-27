@@ -5,7 +5,7 @@
     <!-- Audio and model downloads only. No analytics. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="rattil"
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
