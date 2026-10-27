@@ -53,12 +53,20 @@ class QSurah {
 }
 
 class SurahInfo {
-  const SurahInfo({required this.number, required this.name, required this.tname, required this.ename, required this.ayahs});
+  const SurahInfo({
+    required this.number,
+    required this.name,
+    required this.tname,
+    required this.ename,
+    required this.ayahs,
+    this.meccan = true,
+  });
   final int number;
   final String name;
   final String tname;
   final String ename;
   final int ayahs;
+  final bool meccan;
 
   factory SurahInfo.fromJson(Map<String, dynamic> j) => SurahInfo(
         number: j['s'] as int,
@@ -66,7 +74,49 @@ class SurahInfo {
         tname: j['tname'] as String,
         ename: j['ename'] as String,
         ayahs: j['ayas'] as int,
+        meccan: j['type'] != 'Medinan',
       );
+}
+
+/// A place in the Quran.
+typedef AyahRef = ({int surah, int ayah});
+
+int compareRef(AyahRef a, AyahRef b) => a.surah != b.surah ? a.surah - b.surah : a.ayah - b.ayah;
+
+/// Madani page, juz, hizb quarter and sajdah starts (Tanzil metadata).
+class QuranMeta {
+  QuranMeta._(this.pages, this.juz, this.quarters, this.sajdas);
+
+  factory QuranMeta.fromJson(Map<String, dynamic> j) {
+    List<AyahRef> refs(String key) => [
+          for (final e in j[key] as List) (surah: (e as List)[0] as int, ayah: e[1] as int),
+        ];
+    return QuranMeta._(refs('pages'), refs('juz'), refs('quarters'), refs('sajdas').toSet());
+  }
+
+  /// Start of each page (604), juz (30) and hizb quarter (240), in order.
+  final List<AyahRef> pages;
+  final List<AyahRef> juz;
+  final List<AyahRef> quarters;
+  final Set<AyahRef> sajdas;
+
+  /// 1-based number of the division of [starts] that holds [ref].
+  static int _find(List<AyahRef> starts, AyahRef ref) {
+    var lo = 0, hi = starts.length - 1;
+    while (lo < hi) {
+      final mid = (lo + hi + 1) >> 1;
+      if (compareRef(starts[mid], ref) <= 0) {
+        lo = mid;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return lo + 1;
+  }
+
+  int pageOf(AyahRef ref) => _find(pages, ref);
+  int juzOf(AyahRef ref) => _find(juz, ref);
+  int quarterOf(AyahRef ref) => _find(quarters, ref);
 }
 
 /// Reads the bundled Quran data built by tool/data/build_quran.py.
@@ -75,6 +125,7 @@ class QuranRepo {
 
   final AssetBundle _bundle;
   List<SurahInfo>? _index;
+  QuranMeta? _meta;
   final Map<int, QSurah> _cache = {};
 
   Future<List<SurahInfo>> surahs() async {
@@ -83,6 +134,16 @@ class QuranRepo {
         SurahInfo.fromJson(j as Map<String, dynamic>),
     ];
   }
+
+  Future<QuranMeta> meta() async {
+    return _meta ??= QuranMeta.fromJson(jsonDecode(await _bundle.loadString('assets/quran/meta.json')) as Map<String, dynamic>);
+  }
+
+  /// All surahs, after [surahs] has loaded once (the app loads it at start).
+  List<SurahInfo> get surahsLoaded => _index!;
+
+  /// Pages, juz and quarters, after [meta] has loaded once.
+  QuranMeta get metaLoaded => _meta!;
 
   Future<QSurah> surah(int number) async {
     final cached = _cache[number];

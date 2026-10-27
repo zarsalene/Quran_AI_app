@@ -1,36 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'core/quran/quran_repo.dart';
-import 'features/home/home_screen.dart';
+import 'app_scope.dart';
+import 'features/onboarding/onboarding_screen.dart';
+import 'features/shell.dart';
 import 'l10n/app_localizations.dart';
 
-void main() {
-  runApp(RattilApp(repo: QuranRepo()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(RattilApp(services: await AppServices.create()));
 }
 
+const brandGreen = Color(0xFF1B6B5A);
+
 class RattilApp extends StatelessWidget {
-  const RattilApp({super.key, required this.repo});
-  final QuranRepo repo;
+  const RattilApp({super.key, required this.services});
+  final AppServices services;
 
   @override
   Widget build(BuildContext context) {
     ThemeData theme(Brightness b) => ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1B6B5A), brightness: b),
+          colorScheme: ColorScheme.fromSeed(seedColor: brandGreen, brightness: b),
           useMaterial3: true,
+          visualDensity: VisualDensity.standard,
         );
-    return MaterialApp(
-      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-      theme: theme(Brightness.light),
-      darkTheme: theme(Brightness.dark),
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: HomeScreen(repo: repo),
+    final settings = services.settings;
+    return AppScope(
+      services: services,
+      child: ListenableBuilder(
+        listenable: settings,
+        builder: (context, _) => MaterialApp(
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          theme: theme(Brightness.light),
+          darkTheme: theme(Brightness.dark),
+          themeMode: settings.themeMode,
+          locale: settings.locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: settings.onboarded ? const Shell() : const OnboardingScreen(),
+        ),
+      ),
     );
   }
 }

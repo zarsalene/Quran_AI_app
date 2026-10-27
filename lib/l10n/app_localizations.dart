@@ -333,6 +333,732 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mistake'**
   String get legendMistake;
+
+  /// No description provided for @navToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get navToday;
+
+  /// No description provided for @navQuran.
+  ///
+  /// In en, this message translates to:
+  /// **'Quran'**
+  String get navQuran;
+
+  /// No description provided for @navProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get navProgress;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @actionRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read & listen'**
+  String get actionRead;
+
+  /// No description provided for @actionRecite.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite'**
+  String get actionRecite;
+
+  /// No description provided for @actionMemorize.
+  ///
+  /// In en, this message translates to:
+  /// **'Memorize'**
+  String get actionMemorize;
+
+  /// No description provided for @readHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the reciter word by word'**
+  String get readHelp;
+
+  /// No description provided for @reciteHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The teacher checks each word'**
+  String get reciteHelp;
+
+  /// No description provided for @memorizeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayah by ayah, with reviews'**
+  String get memorizeHelp;
+
+  /// No description provided for @meccan.
+  ///
+  /// In en, this message translates to:
+  /// **'Meccan'**
+  String get meccan;
+
+  /// No description provided for @medinan.
+  ///
+  /// In en, this message translates to:
+  /// **'Medinan'**
+  String get medinan;
+
+  /// No description provided for @ayahN.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayah {n}'**
+  String ayahN(int n);
+
+  /// No description provided for @ayahRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayahs {from}–{to}'**
+  String ayahRange(int from, int to);
+
+  /// No description provided for @pageN.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {n}'**
+  String pageN(int n);
+
+  /// No description provided for @juzN.
+  ///
+  /// In en, this message translates to:
+  /// **'Juz {n}'**
+  String juzN(int n);
+
+  /// No description provided for @goalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s goal'**
+  String get goalTitle;
+
+  /// No description provided for @goalProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {goal} ayahs recited'**
+  String goalProgress(int done, int goal);
+
+  /// No description provided for @goalDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal reached. Well done!'**
+  String get goalDone;
+
+  /// No description provided for @goalAyahs.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 ayah} other{{n} ayahs}}'**
+  String goalAyahs(int n);
+
+  /// No description provided for @streakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =0{Start your streak today} =1{1 day in a row} other{{n} days in a row}}'**
+  String streakDays(int n);
+
+  /// No description provided for @continueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueTitle;
+
+  /// No description provided for @startTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with Al-Fatiha'**
+  String get startTitle;
+
+  /// No description provided for @reviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get reviewTitle;
+
+  /// No description provided for @reviewDue.
+  ///
+  /// In en, this message translates to:
+  /// **'{n, plural, =1{1 ayah to review} other{{n} ayahs to review}}'**
+  String reviewDue(int n);
+
+  /// No description provided for @reviewEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to review today.'**
+  String get reviewEmpty;
+
+  /// No description provided for @reviewDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done: {good} of {total} ayahs remembered well.'**
+  String reviewDone(int good, int total);
+
+  /// No description provided for @chooseSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a surah'**
+  String get chooseSurah;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Word, surah, or 2:255'**
+  String get searchHint;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get searchNoResults;
+
+  /// No description provided for @tabSurahs.
+  ///
+  /// In en, this message translates to:
+  /// **'Surahs'**
+  String get tabSurahs;
+
+  /// No description provided for @tabJuz.
+  ///
+  /// In en, this message translates to:
+  /// **'Juz'**
+  String get tabJuz;
+
+  /// No description provided for @bookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmarks'**
+  String get bookmarks;
+
+  /// No description provided for @noBookmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'No bookmarks yet. Tap an ayah to add one.'**
+  String get noBookmarks;
+
+  /// No description provided for @pageView.
+  ///
+  /// In en, this message translates to:
+  /// **'Page view'**
+  String get pageView;
+
+  /// No description provided for @listView.
+  ///
+  /// In en, this message translates to:
+  /// **'List view'**
+  String get listView;
+
+  /// No description provided for @playFromHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Play from here'**
+  String get playFromHere;
+
+  /// No description provided for @repeatAyah.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat this ayah'**
+  String get repeatAyah;
+
+  /// No description provided for @reciteFromHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite from here'**
+  String get reciteFromHere;
+
+  /// No description provided for @memorizeAyah.
+  ///
+  /// In en, this message translates to:
+  /// **'Memorize this ayah'**
+  String get memorizeAyah;
+
+  /// No description provided for @bookmarkAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Bookmark'**
+  String get bookmarkAdd;
+
+  /// No description provided for @bookmarkRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove bookmark'**
+  String get bookmarkRemove;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @pause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pause;
+
+  /// No description provided for @stop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stop;
+
+  /// No description provided for @loop.
+  ///
+  /// In en, this message translates to:
+  /// **'Loop the range'**
+  String get loop;
+
+  /// No description provided for @speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get speed;
+
+  /// No description provided for @repeatEachTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Times each ayah plays'**
+  String get repeatEachTooltip;
+
+  /// No description provided for @reciterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mishary Rashid Alafasy'**
+  String get reciterName;
+
+  /// No description provided for @audioMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'The audio of this surah is not on your phone.'**
+  String get audioMissing;
+
+  /// No description provided for @downloadSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Download ({mb} MB)'**
+  String downloadSize(String mb);
+
+  /// No description provided for @downloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading… {percent}%'**
+  String downloading(int percent);
+
+  /// No description provided for @downloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed. Check the internet and try again.'**
+  String get downloadFailed;
+
+  /// No description provided for @listenWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to the word'**
+  String get listenWord;
+
+  /// No description provided for @hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hint'**
+  String get hint;
+
+  /// No description provided for @memoryMode.
+  ///
+  /// In en, this message translates to:
+  /// **'From memory'**
+  String get memoryMode;
+
+  /// No description provided for @hiddenHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite from memory. Each word shows when you say it correctly.'**
+  String get hiddenHelp;
+
+  /// No description provided for @hiddenWord.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden word'**
+  String get hiddenWord;
+
+  /// No description provided for @stepListen.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Listen'**
+  String get stepListen;
+
+  /// No description provided for @stepRead.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Read along'**
+  String get stepRead;
+
+  /// No description provided for @stepMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'3. From memory'**
+  String get stepMemory;
+
+  /// No description provided for @stepListenHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen 3 times. Follow each word with your eyes.'**
+  String get stepListenHelp;
+
+  /// No description provided for @stepListenNoAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the ayah aloud 3 times, slowly.'**
+  String get stepListenNoAudio;
+
+  /// No description provided for @listenAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen again'**
+  String get listenAgain;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @nextAyah.
+  ///
+  /// In en, this message translates to:
+  /// **'Next ayah'**
+  String get nextAyah;
+
+  /// No description provided for @finish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get finish;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @memorizedOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Memorized!'**
+  String get memorizedOk;
+
+  /// No description provided for @notYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet. Try again: you will get it.'**
+  String get notYet;
+
+  /// No description provided for @nextReview.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{Next review: tomorrow} other{Next review: in {days} days}}'**
+  String nextReview(int days);
+
+  /// No description provided for @allDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Well done!'**
+  String get allDone;
+
+  /// No description provided for @allDoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'These ayahs are now in your reviews. Come back when they are due.'**
+  String get allDoneBody;
+
+  /// No description provided for @badgeEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'New badge!'**
+  String get badgeEarned;
+
+  /// No description provided for @badgeFirstSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'First surah memorized'**
+  String get badgeFirstSurah;
+
+  /// No description provided for @badgeJuzAmma.
+  ///
+  /// In en, this message translates to:
+  /// **'Juz Amma memorized'**
+  String get badgeJuzAmma;
+
+  /// No description provided for @badgeStreak7.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days in a row'**
+  String get badgeStreak7;
+
+  /// No description provided for @badgeStreak30.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days in a row'**
+  String get badgeStreak30;
+
+  /// No description provided for @badgeFirstReview.
+  ///
+  /// In en, this message translates to:
+  /// **'First review'**
+  String get badgeFirstReview;
+
+  /// No description provided for @badgesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Badges'**
+  String get badgesTitle;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @statStreak.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in a row'**
+  String get statStreak;
+
+  /// No description provided for @statBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best streak'**
+  String get statBest;
+
+  /// No description provided for @statMemorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayahs memorized'**
+  String get statMemorized;
+
+  /// No description provided for @weekTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayahs recited, last 7 days'**
+  String get weekTitle;
+
+  /// No description provided for @masteryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Quran map'**
+  String get masteryTitle;
+
+  /// No description provided for @masteryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not started'**
+  String get masteryNone;
+
+  /// No description provided for @masteryStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get masteryStarted;
+
+  /// No description provided for @masteryMemorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Memorized'**
+  String get masteryMemorized;
+
+  /// No description provided for @masteryStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get masteryStrong;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @languageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone language'**
+  String get languageSystem;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get settingsTheme;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @settingsFont.
+  ///
+  /// In en, this message translates to:
+  /// **'Quran text size'**
+  String get settingsFont;
+
+  /// No description provided for @settingsTeacher.
+  ///
+  /// In en, this message translates to:
+  /// **'Teacher'**
+  String get settingsTeacher;
+
+  /// No description provided for @settingsGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily goal'**
+  String get settingsGoal;
+
+  /// No description provided for @settingsAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Recitation audio'**
+  String get settingsAudio;
+
+  /// No description provided for @audioOnPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Al-Fatiha and Juz 30 are included. Downloaded: {mb} MB.'**
+  String audioOnPhone(String mb);
+
+  /// No description provided for @downloadAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all surahs ({mb} MB)'**
+  String downloadAll(String mb);
+
+  /// No description provided for @downloadingAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading surah {surah}…'**
+  String downloadingAll(int surah);
+
+  /// No description provided for @downloadAllHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Wi-Fi. After this, all audio works offline.'**
+  String get downloadAllHelp;
+
+  /// No description provided for @deleteDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete downloaded audio'**
+  String get deleteDownloads;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all downloaded audio? Al-Fatiha and Juz 30 stay.'**
+  String get confirmDelete;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @settingsAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAbout;
+
+  /// No description provided for @privacy.
+  ///
+  /// In en, this message translates to:
+  /// **'No ads. No account. Your voice never leaves your phone.'**
+  String get privacy;
+
+  /// No description provided for @sourcesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get sourcesTitle;
+
+  /// No description provided for @sourcesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Font: Amiri Quran.'**
+  String get sourcesBody;
+
+  /// No description provided for @licenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Licenses'**
+  String get licenses;
+
+  /// No description provided for @onb1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn the Quran with a teacher on your phone'**
+  String get onb1Title;
+
+  /// No description provided for @onb1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Read, listen, recite, and memorize. It all works without internet.'**
+  String get onb1Body;
+
+  /// No description provided for @onb2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'The teacher listens to you'**
+  String get onb2Title;
+
+  /// No description provided for @onb2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite aloud. Each word gets a color. At a mistake, the teacher stops, plays the correct word, and you try again.'**
+  String get onb2Body;
+
+  /// No description provided for @onb3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'A small goal every day'**
+  String get onb3Title;
+
+  /// No description provided for @onb3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'How many ayahs do you want to recite each day? You can change this later.'**
+  String get onb3Body;
+
+  /// No description provided for @start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get start;
 }
 
 class _AppLocalizationsDelegate

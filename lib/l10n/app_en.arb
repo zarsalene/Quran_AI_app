@@ -4,7 +4,13 @@
   "homeStart": "Start with a short surah",
   "homeAll": "All surahs",
   "ayahCount": "{count, plural, =1{1 ayah} other{{count} ayahs}}",
-  "@ayahCount": { "placeholders": { "count": { "type": "int" } } },
+  "@ayahCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "modeStrict": "Strict",
   "modeGentle": "Gentle",
   "modeStrictHelp": "Stops at a mistake",
@@ -20,7 +26,13 @@
   "tooNoisy": "Too noisy. Move to a quieter place.",
   "perfect": "Perfect",
   "doneWithMistakes": "{count, plural, =1{Done. 1 mistake to review.} other{Done. {count} mistakes to review.}}",
-  "@doneWithMistakes": { "placeholders": { "count": { "type": "int" } } },
+  "@doneWithMistakes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "doneNotPerfect": "Done. Check the orange words.",
   "again": "Start again",
   "disclaimer": "Automatic feedback can be wrong. It does not replace a qualified teacher.",
@@ -29,7 +41,13 @@
   "micContinue": "Continue",
   "micDenied": "Rattil needs the microphone to listen to your recitation. Allow it in the phone settings.",
   "errorStart": "The teacher could not start: {message}",
-  "@errorStart": { "placeholders": { "message": { "type": "String" } } },
+  "@errorStart": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "issueMissingWord": "Missing word",
   "issueWrongLetter": "Wrong letter",
   "issueMissingLetter": "Missing letter",
@@ -41,5 +59,240 @@
   "issueTajweed": "Tajweed hint (beta)",
   "legendCorrect": "Correct",
   "legendCheck": "Check",
-  "legendMistake": "Mistake"
+  "legendMistake": "Mistake",
+  "navToday": "Today",
+  "navQuran": "Quran",
+  "navProgress": "Progress",
+  "navSettings": "Settings",
+  "actionRead": "Read & listen",
+  "actionRecite": "Recite",
+  "actionMemorize": "Memorize",
+  "readHelp": "Follow the reciter word by word",
+  "reciteHelp": "The teacher checks each word",
+  "memorizeHelp": "Ayah by ayah, with reviews",
+  "meccan": "Meccan",
+  "medinan": "Medinan",
+  "ayahN": "Ayah {n}",
+  "@ayahN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ayahRange": "Ayahs {from}–{to}",
+  "@ayahRange": {
+    "placeholders": {
+      "from": {
+        "type": "int"
+      },
+      "to": {
+        "type": "int"
+      }
+    }
+  },
+  "pageN": "Page {n}",
+  "@pageN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "juzN": "Juz {n}",
+  "@juzN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "goalTitle": "Today's goal",
+  "goalProgress": "{done} of {goal} ayahs recited",
+  "@goalProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "goalDone": "Goal reached. Well done!",
+  "goalAyahs": "{n, plural, =1{1 ayah} other{{n} ayahs}}",
+  "@goalAyahs": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "streakDays": "{n, plural, =0{Start your streak today} =1{1 day in a row} other{{n} days in a row}}",
+  "@streakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "continueTitle": "Continue",
+  "startTitle": "Start with Al-Fatiha",
+  "reviewTitle": "Review",
+  "reviewDue": "{n, plural, =1{1 ayah to review} other{{n} ayahs to review}}",
+  "@reviewDue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewEmpty": "Nothing to review today.",
+  "reviewDone": "Done: {good} of {total} ayahs remembered well.",
+  "@reviewDone": {
+    "placeholders": {
+      "good": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseSurah": "Choose a surah",
+  "search": "Search",
+  "searchHint": "Word, surah, or 2:255",
+  "searchNoResults": "No results",
+  "tabSurahs": "Surahs",
+  "tabJuz": "Juz",
+  "bookmarks": "Bookmarks",
+  "noBookmarks": "No bookmarks yet. Tap an ayah to add one.",
+  "pageView": "Page view",
+  "listView": "List view",
+  "playFromHere": "Play from here",
+  "repeatAyah": "Repeat this ayah",
+  "reciteFromHere": "Recite from here",
+  "memorizeAyah": "Memorize this ayah",
+  "bookmarkAdd": "Bookmark",
+  "bookmarkRemove": "Remove bookmark",
+  "play": "Play",
+  "pause": "Pause",
+  "stop": "Stop",
+  "loop": "Loop the range",
+  "speed": "Speed",
+  "repeatEachTooltip": "Times each ayah plays",
+  "reciterName": "Mishary Rashid Alafasy",
+  "audioMissing": "The audio of this surah is not on your phone.",
+  "downloadSize": "Download ({mb} MB)",
+  "@downloadSize": {
+    "placeholders": {
+      "mb": {
+        "type": "String"
+      }
+    }
+  },
+  "downloading": "Downloading… {percent}%",
+  "@downloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadFailed": "Download failed. Check the internet and try again.",
+  "listenWord": "Listen to the word",
+  "hint": "Hint",
+  "memoryMode": "From memory",
+  "hiddenHelp": "Recite from memory. Each word shows when you say it correctly.",
+  "hiddenWord": "Hidden word",
+  "stepListen": "1. Listen",
+  "stepRead": "2. Read along",
+  "stepMemory": "3. From memory",
+  "stepListenHelp": "Listen 3 times. Follow each word with your eyes.",
+  "stepListenNoAudio": "Read the ayah aloud 3 times, slowly.",
+  "listenAgain": "Listen again",
+  "next": "Next",
+  "nextAyah": "Next ayah",
+  "finish": "Finish",
+  "tryAgain": "Try again",
+  "memorizedOk": "Memorized!",
+  "notYet": "Not yet. Try again: you will get it.",
+  "nextReview": "{days, plural, =1{Next review: tomorrow} other{Next review: in {days} days}}",
+  "@nextReview": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "allDone": "Well done!",
+  "allDoneBody": "These ayahs are now in your reviews. Come back when they are due.",
+  "badgeEarned": "New badge!",
+  "badgeFirstSurah": "First surah memorized",
+  "badgeJuzAmma": "Juz Amma memorized",
+  "badgeStreak7": "7 days in a row",
+  "badgeStreak30": "30 days in a row",
+  "badgeFirstReview": "First review",
+  "badgesTitle": "Badges",
+  "ok": "OK",
+  "statStreak": "Days in a row",
+  "statBest": "Best streak",
+  "statMemorized": "Ayahs memorized",
+  "weekTitle": "Ayahs recited, last 7 days",
+  "masteryTitle": "Your Quran map",
+  "masteryNone": "Not started",
+  "masteryStarted": "Started",
+  "masteryMemorized": "Memorized",
+  "masteryStrong": "Strong",
+  "settingsLanguage": "Language",
+  "languageSystem": "Phone language",
+  "settingsTheme": "Theme",
+  "themeSystem": "Auto",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsFont": "Quran text size",
+  "settingsTeacher": "Teacher",
+  "settingsGoal": "Daily goal",
+  "settingsAudio": "Recitation audio",
+  "audioOnPhone": "Al-Fatiha and Juz 30 are included. Downloaded: {mb} MB.",
+  "@audioOnPhone": {
+    "placeholders": {
+      "mb": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadAll": "Download all surahs ({mb} MB)",
+  "@downloadAll": {
+    "placeholders": {
+      "mb": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadingAll": "Downloading surah {surah}…",
+  "@downloadingAll": {
+    "placeholders": {
+      "surah": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadAllHelp": "Use Wi-Fi. After this, all audio works offline.",
+  "deleteDownloads": "Delete downloaded audio",
+  "confirmDelete": "Delete all downloaded audio? Al-Fatiha and Juz 30 stay.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "settingsAbout": "About",
+  "privacy": "No ads. No account. Your voice never leaves your phone.",
+  "sourcesTitle": "Sources",
+  "sourcesBody": "Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Font: Amiri Quran.",
+  "licenses": "Licenses",
+  "onb1Title": "Learn the Quran with a teacher on your phone",
+  "onb1Body": "Read, listen, recite, and memorize. It all works without internet.",
+  "onb2Title": "The teacher listens to you",
+  "onb2Body": "Recite aloud. Each word gets a color. At a mistake, the teacher stops, plays the correct word, and you try again.",
+  "onb3Title": "A small goal every day",
+  "onb3Body": "How many ayahs do you want to recite each day? You can change this later.",
+  "start": "Start"
 }

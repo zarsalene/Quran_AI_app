@@ -1,7 +1,9 @@
 """Download the bundled recitation audio into assets/audio/ and verify it.
 
-    python tool/fetch_audio.py          # CI and local builds
-    python tool/fetch_audio.py --pin    # once, after the audio source changes
+    python tool/fetch_audio.py --pin    # after the audio source changes
+
+The encoded MP3s are committed, so builds do not run this script. Run it only
+to change the bundled audio, then commit assets/audio/ and data/AUDIO_CHECKSUMS.
 
 Bundled: Al-Fatiha and Juz 30 (surahs 78-114), Alafasy, so a new user can
 listen and learn with no internet. Other surahs download in the app.
@@ -69,7 +71,7 @@ def main() -> int:
             return 1
         out_pins.append(f"{got} *{name}")
         out = DEST / name
-        stamp = DEST / f".{name}.src"
+        stamp = CACHE / f"{name}.encoded"  # outside assets/, so it never ships
         if out.exists() and stamp.exists() and stamp.read_text() == got:
             print(f"ok      {name}")
             continue

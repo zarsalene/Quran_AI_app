@@ -48,7 +48,9 @@ def main() -> int:
             a = int(vt["verse_key"].split(":")[1])
             # The reciter sometimes goes back and repeats a phrase, so a word
             # can have several segments. Keep them in time order: [word, from, to].
-            segs = [seg for seg in vt["segments"] if len(seg) == 3]
+            # A few segments in the source end before they start: drop them
+            # (the word then plays from the word before to the word after).
+            segs = [seg for seg in vt["segments"] if len(seg) == 3 and seg[2] > seg[1]]
             n = words_per_ayah[a]
             # A few ayahs count words from 0 instead of 1.
             if segs and min(seg[0] for seg in segs) == 0:

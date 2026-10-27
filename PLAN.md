@@ -13,6 +13,10 @@ Full spec: [AGENT_PROMPT.md](AGENT_PROMPT.md). Each slice ends with `flutter ana
 - Pin SHA-256 in `data/CHECKSUMS`. Write `assets/quran.db` (surahs, ayahs, words, pages, phonemes per word).
 - Gate in CI: 114 / 6236 counts, QUL vs Tanzil normalized word diff = 0, golden strings copied from source files.
 
+## Status (2026-10-27)
+- Done: slices 2, 3, 5, 6 and most of 4 and 7 (see below). Open: QUL text/font pair (needs a manual QUL download), `tool/eval` + EVAL.md, daily reminder notifications, golden screenshot tests.
+- Audio: Alafasy per-surah files from quran.com with word timings (`tool/data/fetch_timings.py`). Al-Fatiha + Juz 30 bundled at 40 kbps (17 MB, `tool/fetch_audio.py`); other surahs download in the app.
+
 ## 2. App skeleton + Read
 - Flutter project, riverpod, drift, l10n (ar/en/fr), theme, CI workflow (`--split-per-abi`).
 - Mushaf page view (604 pages), ayah list, normalized search, bookmarks, resume, basmala rules.

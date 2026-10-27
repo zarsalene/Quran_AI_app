@@ -1,18 +1,24 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../../app_scope.dart';
 import '../../core/align/models.dart';
 import '../../core/align/session.dart';
+import '../../core/progress/progress_store.dart';
 import '../../core/quran/quran_repo.dart';
 import '../../l10n/app_localizations.dart';
+import '../common.dart';
 import 'teacher_controller.dart';
 
-const quranFont = 'AmiriQuran';
-
+/// Recite an ayah range; the teacher checks each word.
 class ReciteScreen extends StatefulWidget {
-  const ReciteScreen({super.key, required this.repo, required this.info});
+  const ReciteScreen({super.key, required this.surah, required this.from, required this.to});
 
-  final QuranRepo repo;
-  final SurahInfo info;
+  final int surah;
+  final int from;
+  final int to;
 
   @override
   State<ReciteScreen> createState() => _ReciteScreenState();
@@ -20,7 +26,7 @@ class ReciteScreen extends StatefulWidget {
 
 class _ReciteScreenState extends State<ReciteScreen> {
   TeacherController? _c;
-  static bool _micExplained = false;
+  late final _services = AppScope.of(context);
 
   @override
   void initState() {
@@ -29,9 +35,17 @@ class _ReciteScreenState extends State<ReciteScreen> {
   }
 
   Future<void> _load() async {
-    final surah = await widget.repo.surah(widget.info.number);
-    final fatiha = await widget.repo.surah(1);
-    final c = TeacherController(SurahLayout(surah, fatiha));
+    final c = await createTeacher(_services, widget.surah, from: widget.from, to: widget.to);
+    if (!mounted) {
+      c.dispose();
+      return;
+    }
+    c.onAyahDone = (a) {
+      _services.progress.addRecited(1);
+      final next = a < c.layout.ayahCount ? a + 1 : a;
+      _services.progress.setLast(ActivityKind.recite, widget.surah, next);
+    };
+    _services.progress.setLast(ActivityKind.recite, widget.surah, widget.from);
     setState(() => _c = c);
     await c.init();
   }
@@ -42,60 +56,174 @@ class _ReciteScreenState extends State<ReciteScreen> {
     super.dispose();
   }
 
-  Future<void> _onMic() async {
-    final c = _c!;
-    if (c.phase == TeacherPhase.listening) {
-      await c.stopListening();
+  @override
+  Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
+    final info = _services.repo.surahsLoaded[widget.surah - 1];
+    final c = _c;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(info.name, style: const TextStyle(fontFamily: quranFont, fontSize: 24)),
+        actions: [
+          if (c != null)
+            ListenableBuilder(
+              listenable: c,
+              builder: (context, _) => IconButton(
+                tooltip: t.memoryMode,
+                isSelected: c.hidden,
+                icon: const Icon(Icons.visibility),
+                selectedIcon: const Icon(Icons.visibility_off),
+                onPressed: c.phase == TeacherPhase.listening ? null : () => c.setRange(c.fromAyah, c.toAyah, hidden: !c.hidden),
+              ),
+            ),
+        ],
+      ),
+      body: c == null
+          ? const Center(child: CircularProgressIndicator())
+          : TeacherView(controller: c, showModePicker: true, onFinished: () => celebrateNewBadges(context)),
+    );
+  }
+}
+
+/// Loads the surah and builds a teacher for ayahs [from]..[to].
+Future<TeacherController> createTeacher(AppServices s, int surah,
+    {required int from, required int to, bool hidden = false, TeacherMode? mode}) async {
+  final q = await s.repo.surah(surah);
+  final fatiha = await s.repo.surah(1);
+  return TeacherController(SurahLayout(q, fatiha),
+      fromAyah: from, toAyah: to, hidden: hidden, mode: mode ?? s.settings.teacherMode);
+}
+
+bool _micExplained = false;
+
+/// Explains the mic once, asks for it, then starts listening.
+Future<void> startListening(BuildContext context, TeacherController c) async {
+  if (c.phase == TeacherPhase.listening) {
+    await c.stopListening();
+    return;
+  }
+  AppScope.of(context).player.stop();
+  if (!await c.micAllowed()) {
+    if (!_micExplained && context.mounted) {
+      final t = AppLocalizations.of(context);
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          icon: const Icon(Icons.mic),
+          title: Text(t.micTitle),
+          content: Text(t.micBody),
+          actions: [FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.micContinue))],
+        ),
+      );
+      if (ok != true) return;
+      _micExplained = true;
+    }
+    if (!await c.requestMic()) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).micDenied)));
+      }
       return;
     }
-    if (!await c.micAllowed()) {
-      if (!_micExplained && mounted) {
-        final t = AppLocalizations.of(context);
-        final ok = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            icon: const Icon(Icons.mic),
-            title: Text(t.micTitle),
-            content: Text(t.micBody),
-            actions: [FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t.micContinue))],
-          ),
-        );
-        if (ok != true) return;
-        _micExplained = true;
-      }
-      if (!await c.requestMic()) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).micDenied)));
-        }
-        return;
-      }
+  }
+  if (c.phase == TeacherPhase.finished || c.phase == TeacherPhase.ready) await c.start();
+}
+
+/// The teacher on screen: the text, word colors, and the controls.
+class TeacherView extends StatefulWidget {
+  const TeacherView({
+    super.key,
+    required this.controller,
+    this.showModePicker = false,
+    this.onFinished,
+    this.finishedAction,
+  });
+
+  final TeacherController controller;
+  final bool showModePicker;
+  final VoidCallback? onFinished;
+
+  /// Replaces "Start again" when the range is finished (memorization: Next).
+  final Widget? finishedAction;
+
+  @override
+  State<TeacherView> createState() => _TeacherViewState();
+}
+
+class _TeacherViewState extends State<TeacherView> {
+  TeacherPhase? _lastPhase;
+  late final _services = AppScope.of(context);
+
+  TeacherController get c => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+    c.addListener(_onChange);
+  }
+
+  @override
+  void didUpdateWidget(TeacherView old) {
+    super.didUpdateWidget(old);
+    if (old.controller != c) {
+      old.controller.removeListener(_onChange);
+      c.addListener(_onChange);
     }
-    await c.start();
+  }
+
+  @override
+  void dispose() {
+    c.removeListener(_onChange);
+    WakelockPlus.disable();
+    _services.player.stop();
+    super.dispose();
+  }
+
+  void _onChange() {
+    final phase = c.phase;
+    if (phase == _lastPhase) return;
+    _lastPhase = phase;
+    // Keep the screen on while listening.
+    phase == TeacherPhase.listening ? WakelockPlus.enable() : WakelockPlus.disable();
+    if (phase == TeacherPhase.stopped) unawaited(playStopWord());
+    if (phase == TeacherPhase.finished) widget.onFinished?.call();
+  }
+
+  bool get _canPlay => _services.audio.isAvailable(c.layout.surah.number);
+
+  /// The model answer: the reciter says the word the reader got wrong.
+  Future<void> playStopWord() async {
+    final w = c.stopWord;
+    if (w == null || !_canPlay) return;
+    final inAyah = c.layout.wordInAyah(w);
+    if (inAyah < 0) return;
+    try {
+      await _services.player.playWord(c.layout.surah.number, c.layout.wordAyah[w], inAyah);
+    } catch (_) {
+      // Audio is a help, never a blocker.
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final c = _c;
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.info.name, style: const TextStyle(fontSize: 24))),
-      body: c == null
-          ? const Center(child: CircularProgressIndicator())
-          : ListenableBuilder(
-              listenable: c,
-              builder: (context, _) => Column(
-                children: [
-                  if (c.phase != TeacherPhase.listening) _ModePicker(c),
-                  Expanded(child: _SurahText(c)),
-                  _BottomPanel(c, onMic: _onMic),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                    child: Text(t.disclaimer,
-                        textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
-                  ),
-                ],
-              ),
-            ),
+    return ListenableBuilder(
+      listenable: Listenable.merge([c, _services.settings]),
+      builder: (context, _) => Column(
+        children: [
+          if (widget.showModePicker && c.phase != TeacherPhase.listening) _ModePicker(c),
+          Expanded(child: _SurahText(c)),
+          _BottomPanel(
+            c,
+            onMic: () => startListening(context, c),
+            onListenWord: _canPlay ? playStopWord : null,
+            finishedAction: widget.finishedAction,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Text(t.disclaimer, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -117,7 +245,10 @@ class _ModePicker extends StatelessWidget {
               ButtonSegment(value: TeacherMode.gentle, label: Text(t.modeGentle), icon: const Icon(Icons.edit_note)),
             ],
             selected: {c.mode},
-            onSelectionChanged: (s) => c.setMode(s.first),
+            onSelectionChanged: (s) {
+              c.setMode(s.first);
+              AppScope.of(context).settings.teacherMode = s.first;
+            },
           ),
           const SizedBox(height: 4),
           Text(c.mode == TeacherMode.strict ? t.modeStrictHelp : t.modeGentleHelp,
@@ -136,17 +267,26 @@ class _SurahText extends StatelessWidget {
   Widget build(BuildContext context) {
     final layout = c.layout;
     final scheme = Theme.of(context).colorScheme;
-    final base = TextStyle(fontFamily: quranFont, fontSize: 28, height: 2.1, color: scheme.onSurface);
+    final size = AppScope.of(context).settings.quranFontSize;
+    final base = TextStyle(fontFamily: quranFont, fontSize: size, height: 2.0, color: scheme.onSurface);
     final children = <Widget>[];
-    if (layout.surah.basmala != null) {
+    if (c.hidden) {
+      children.add(Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Text(AppLocalizations.of(context).hiddenHelp,
+            textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: scheme.primary)),
+      ));
+    }
+    if (c.showsBasmala && layout.surah.basmala != null) {
       children.add(Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(layout.surah.basmala!, textAlign: TextAlign.center, style: base.copyWith(color: scheme.primary)),
       ));
     }
-    var w = layout.basmalaWords;
-    for (final ayah in layout.surah.ayahs) {
+    for (var a = c.fromAyah; a <= c.toAyah; a++) {
+      final ayah = layout.surah.ayahs[a - 1];
       final spans = <Widget>[];
+      var w = layout.ayahFirstWord(a);
       for (final word in ayah.words) {
         spans.add(_Word(word: word, index: w, c: c, style: base));
         w++;
@@ -178,27 +318,32 @@ class _Word extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = c.results[index];
     final isStop = c.stopWord == index;
-    final color = _color(context, r, isStop);
+    final visible = c.isVisible(index);
+    final scheme = Theme.of(context).colorScheme;
+    final color = visible ? _color(r, isStop) : Colors.transparent;
     final text = word.mark == null ? word.text : '${word.text} ${word.mark}';
     return Semantics(
-      label: r?.status.name,
+      label: visible ? r?.status.name : AppLocalizations.of(context).hiddenWord,
       child: InkWell(
         borderRadius: BorderRadius.circular(8),
-        onTap: r == null || r.issues.isEmpty ? null : () => _showIssues(context, r),
+        onTap: r == null || r.issues.isEmpty || !visible ? null : () => _showIssues(context, r),
         child: Container(
           constraints: const BoxConstraints(minHeight: 48),
           padding: const EdgeInsets.symmetric(horizontal: 2),
           decoration: isStop
               ? BoxDecoration(color: Colors.red.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8))
-              : null,
+              : !visible
+                  ? BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8))
+                  : null,
           child: Text(text, textDirection: TextDirection.rtl, style: style.copyWith(color: color)),
         ),
       ),
     );
   }
 
-  Color? _color(BuildContext context, WordResult? r, bool isStop) {
+  Color? _color(WordResult? r, bool isStop) {
     if (isStop) return Colors.red.shade700;
+    if (c.peeked.contains(index) && (r == null || r.status == WordStatus.pending)) return Colors.blueGrey;
     if (r == null) return null;
     return switch (r.status) {
       WordStatus.pending => null,
@@ -260,16 +405,18 @@ class _AyahNumber extends StatelessWidget {
 }
 
 class _BottomPanel extends StatelessWidget {
-  const _BottomPanel(this.c, {required this.onMic});
+  const _BottomPanel(this.c, {required this.onMic, this.onListenWord, this.finishedAction});
   final TeacherController c;
   final VoidCallback onMic;
+  final VoidCallback? onListenWord;
+  final Widget? finishedAction;
 
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final String message;
-    Widget? action;
+    final actions = <Widget>[];
     switch (c.phase) {
       case TeacherPhase.loading:
         message = t.teacherLoading;
@@ -284,18 +431,26 @@ class _BottomPanel extends StatelessWidget {
         message = c.stopWasJump
             ? t.jumpedBody
             : '${t.stopTitle}: ${issue == null ? '' : issueLabel(t, issue.type)}. ${t.stopBody}';
-        action = FilledButton.icon(
-          onPressed: c.resume,
+        if (onListenWord != null) {
+          actions.add(OutlinedButton.icon(onPressed: onListenWord, icon: const Icon(Icons.volume_up), label: Text(t.listenWord)));
+        }
+        actions.add(FilledButton.icon(
+          onPressed: () async {
+            // The mic must not hear the reciter.
+            await AppScope.of(context).player.stop();
+            await c.resume();
+          },
           icon: const Icon(Icons.replay),
           label: Text(t.repeatFromHere),
-        );
+        ));
       case TeacherPhase.finished:
         message = c.perfect
             ? t.perfect
             : c.mistakes > 0
                 ? t.doneWithMistakes(c.mistakes)
                 : t.doneNotPerfect;
-        action = OutlinedButton.icon(onPressed: c.start, icon: const Icon(Icons.restart_alt), label: Text(t.again));
+        actions.add(finishedAction ??
+            OutlinedButton.icon(onPressed: c.start, icon: const Icon(Icons.restart_alt), label: Text(t.again)));
     }
     final listening = c.phase == TeacherPhase.listening;
     final canMic = c.phase == TeacherPhase.ready || listening;
@@ -312,20 +467,27 @@ class _BottomPanel extends StatelessWidget {
                     ? theme.textTheme.headlineSmall?.copyWith(color: Colors.green.shade700)
                     : theme.textTheme.titleMedium),
             const SizedBox(height: 12),
-            ?action,
+            if (actions.isNotEmpty) Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: actions),
             if (canMic)
-              SizedBox(
-                width: 72,
-                height: 72,
-                child: FloatingActionButton.large(
-                  heroTag: 'mic',
-                  onPressed: onMic,
-                  backgroundColor: listening ? Colors.red.shade600 : theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  tooltip: listening ? t.listening : t.tapToStart,
-                  child: Icon(listening ? Icons.stop : Icons.mic, size: 36),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                if (c.hidden)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 24),
+                    child: OutlinedButton.icon(onPressed: c.peek, icon: const Icon(Icons.lightbulb_outline), label: Text(t.hint)),
+                  ),
+                SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: FloatingActionButton.large(
+                    heroTag: null,
+                    onPressed: onMic,
+                    backgroundColor: listening ? Colors.red.shade600 : theme.colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    tooltip: listening ? t.listening : t.tapToStart,
+                    child: Icon(listening ? Icons.stop : Icons.mic, size: 36),
+                  ),
                 ),
-              ),
+              ]),
           ],
         ),
       ),
