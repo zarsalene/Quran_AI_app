@@ -29,11 +29,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        // Fixed key for test builds, so each new APK installs over the last
+        // one. Not secret (see tool/make_test_keystore.py). Replace with a
+        // private key from GitHub Secrets before a public release.
+        create("test") {
+            storeFile = file("test-signing.p12")
+            storeType = "pkcs12"
+            storePassword = "rattil-test"
+            keyAlias = "rattil"
+            keyPassword = "rattil-test"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("test")
         }
     }
 }

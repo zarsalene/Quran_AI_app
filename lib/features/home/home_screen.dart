@@ -4,6 +4,9 @@ import '../../core/quran/quran_repo.dart';
 import '../../l10n/app_localizations.dart';
 import '../teacher/recite_screen.dart';
 
+/// Set by CI with --dart-define, so a tester can see which build is installed.
+const appVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');
+
 /// Al-Fatiha, then Juz 30 from its shortest surahs at the end, so a new
 /// reader gets quick wins first.
 const starterSurahs = [1, 114, 113, 112, 111, 110, 109, 108, 107, 106, 105, 104, 103, 102, 101, 100, 99, 98, 97,
@@ -25,7 +28,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(t.appTitle)),
+      appBar: AppBar(
+        title: Text(t.appTitle),
+        actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 16),
+            child: Text(appVersion, style: Theme.of(context).textTheme.bodySmall),
+          ),
+        ],
+      ),
       body: FutureBuilder<List<SurahInfo>>(
         future: _surahs,
         builder: (context, snap) {

@@ -31,7 +31,12 @@ jobs:
       - run: flutter analyze
       - run: flutter test
 
-      - run: flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
+      # The run number makes every build newer than the last, so it installs
+      # as an update. The app shows the version on its home screen.
+      - run: >
+          flutter build apk --release --split-per-abi --target-platform android-arm,android-arm64
+          --build-number ${{ github.run_number }}
+          --dart-define=APP_VERSION=0.2.${{ github.run_number }}
 
       - uses: actions/upload-artifact@v4
         with:
