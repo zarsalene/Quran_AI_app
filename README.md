@@ -60,3 +60,7 @@ The APKs are in `build/app/outputs/flutter-apk/`.
 - Speech model: zipformer_p-arabic-v2 by Muno459 / Quran-Lab, under the Quran-Lab No-Profit License 1.1. It may be used only in apps that are free for their users. The license file ships in the app.
 - Voice activity detection: [Silero VAD](https://github.com/snakers4/silero-vad) through [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).
 - Recitation audio: [everyayah.com](https://everyayah.com).
+
+## Download website
+
+The trilingual Rattil download website is in [`prototype-pwa`](prototype-pwa/README.md). To run it locally, open a terminal in that folder and run `npm start`. The README there also covers GitHub Pages and Cloudflare Pages deployment.

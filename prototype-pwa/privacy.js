@@ -27,7 +27,7 @@ const policy = {
 
 const select=document.querySelector('#language');
 const language=()=>localStorage.getItem('rattil-site-language')||navigator.language?.toLowerCase().split('-')[0]||'en';
-function render(lang){const t=policy[lang]||policy.en;document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';select.value=lang;document.title=`${t.title} — Rattil`;document.querySelectorAll('[data-p]').forEach(el=>{el.textContent=t[el.dataset.p]});document.querySelector('#policy-content').innerHTML=t.sections.map(([heading,body])=>`<section><h2>${heading}</h2><p>${body}</p></section>`).join('')}
+function render(lang){const t=policy[lang]||policy.en;document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';select.value=lang;select.setAttribute('aria-label',t.language);document.title=`${t.title} — Rattil`;document.querySelectorAll('[data-p]').forEach(el=>{el.textContent=t[el.dataset.p]});document.querySelector('#policy-content').innerHTML=t.sections.map(([heading,body])=>`<section><h2>${heading}</h2><p>${body}</p></section>`).join('')}
 select.addEventListener('change',()=>{localStorage.setItem('rattil-site-language',select.value);render(select.value)});
 document.querySelector('#year').textContent=new Date().getFullYear();
 render(language());

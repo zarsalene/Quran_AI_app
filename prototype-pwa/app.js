@@ -53,7 +53,9 @@ function render(lang) {
   document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   document.querySelector('#language').value = lang;
   document.title = ({en:'Rattil — Your journey with the Quran starts here',fr:'Rattil — Votre chemin avec le Coran commence ici',ar:'رتّل — رحلتك مع القرآن تبدأ من هنا'})[lang];
+  document.querySelector('#language').setAttribute('aria-label', t.languageLabel);
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t[el.dataset.i18n]; });
+  document.querySelectorAll('[data-aria-i18n]').forEach(el => { el.setAttribute('aria-label', t[el.dataset.ariaI18n]); });
   document.querySelectorAll('[data-download]').forEach(el => { el.href = APK_URL; el.setAttribute('download','Rattil.apk'); });
   document.querySelector('.footer-links a:nth-child(2)').href = REPO_URL;
   document.querySelector('#feature-grid').innerHTML = t.featureCards.map((card, i) => `<article class="feature-card feature-card-${i+1}"><div class="feature-icon"><svg aria-hidden="true" viewBox="0 0 24 24">${icons[card.icon]}</svg></div><h3>${card.title}</h3><p>${card.body}</p><div class="feature-detail">${card.detail}</div></article>`).join('');
