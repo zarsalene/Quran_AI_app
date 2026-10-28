@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'align/session.dart';
+import 'audio/audio_catalog.dart';
 
 /// User settings, saved on the phone.
 class Settings extends ChangeNotifier {
@@ -32,6 +33,12 @@ class Settings extends ChangeNotifier {
     _prefs.setInt('dailyGoal', v);
     notifyListeners();
   }
+
+  /// Reciter for listening. The teacher always plays words with the
+  /// teaching recording when it is on the phone.
+  Reciter get reciter => Reciter.values.firstWhere((r) => r.name == _prefs.getString('reciter'),
+      orElse: () => Reciter.husaryMuallim);
+  set reciter(Reciter v) => _set('reciter', v.name);
 
   bool get onboarded => _prefs.getBool('onboarded') ?? false;
   set onboarded(bool v) {

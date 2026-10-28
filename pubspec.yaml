@@ -45,7 +45,6 @@ dependencies:
   shared_preferences: ^2.5.6
   wakelock_plus: ^1.8.2
   scrollable_positioned_list: ^0.3.8
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -76,14 +75,31 @@ flutter:
     - assets/models/silero_vad.onnx
     - assets/models/ASR_LICENSE.txt
     - assets/quran/
-    # Al-Fatiha and Juz 30 recitation (tool/fetch_audio.py).
-    - assets/audio/
+    # Al-Fatiha and Juz 30, Al-Husary Muallim (tool/fetch_audio.py).
+    - assets/audio/husary_muallim/
     - assets/fonts/AmiriQuran-OFL.txt
+    - assets/fonts/IBMPlexSansArabic-OFL.txt
+    - assets/fonts/Amiri-OFL.txt
 
   fonts:
     - family: AmiriQuran
       fonts:
         - asset: assets/fonts/AmiriQuran-Regular.ttf
+    # UI: Arabic and Latin in one family (OFL).
+    - family: PlexArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
+    # Titles: surah names and headers (OFL).
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Bold.ttf
+          weight: 700
 
   # To add assets to your application, add an assets section, like this:
   # assets:

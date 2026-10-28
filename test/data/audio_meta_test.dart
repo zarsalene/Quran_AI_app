@@ -82,9 +82,12 @@ void main() {
       expect(t.wordSpan(1), (2000, 3000));
     });
 
-    test('bundled surahs are on disk', () {
-      for (final s in AudioCatalog.bundled) {
-        expect(File('assets/audio/s${s.toString().padLeft(3, '0')}.mp3').existsSync(), isTrue, reason: 'surah $s');
+    test('bundled surahs are on disk for bundled reciters', () {
+      for (final r in Reciter.values.where((r) => r.bundled)) {
+        for (final s in AudioCatalog.bundledSurahs) {
+          expect(File('assets/audio/${r.key}/s${s.toString().padLeft(3, '0')}.mp3').existsSync(), isTrue,
+              reason: '${r.key} surah $s');
+        }
       }
     });
   });

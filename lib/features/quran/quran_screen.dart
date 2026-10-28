@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app_scope.dart';
 import '../../core/progress/learning.dart';
-import '../../core/quran/arabic.dart';
 import '../../core/quran/quran_repo.dart';
 import '../../l10n/app_localizations.dart';
 import '../common.dart';
@@ -21,14 +20,32 @@ class QuranScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(t.navQuran),
-          actions: [
-            IconButton(
-              tooltip: t.search,
-              icon: const Icon(Icons.search),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SearchScreen())),
-            ),
-          ],
-          bottom: TabBar(tabs: [Tab(text: t.tabSurahs), Tab(text: t.tabJuz), Tab(text: t.bookmarks)]),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(112),
+            child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                child: Material(
+                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SearchScreen())),
+                    child: SizedBox(
+                      height: 52,
+                      child: Row(children: [
+                        const SizedBox(width: 16),
+                        Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        const SizedBox(width: 12),
+                        Text(t.searchHint, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                      ]),
+                    ),
+                  ),
+                ),
+              ),
+              TabBar(tabs: [Tab(text: t.tabSurahs), Tab(text: t.tabJuz), Tab(text: t.bookmarks)]),
+            ]),
+          ),
         ),
         body: const TabBarView(children: [_SurahList(), _JuzList(), _Bookmarks()]),
       ),
@@ -67,7 +84,7 @@ class _JuzList extends StatelessWidget {
         final info = repo.surahsLoaded[start.surah - 1];
         return ListTile(
           minVerticalPadding: 12,
-          leading: CircleAvatar(child: Text('${i + 1}')),
+          leading: StarBadge(text: '${i + 1}'),
           title: Text(t.juzN(i + 1)),
           subtitle: Text('${info.name} · ${t.ayahN(start.ayah)} · ${t.pageN(meta.pageOf(start))}'),
           onTap: () => openMushaf(context, meta.pageOf(start)),
@@ -107,7 +124,8 @@ class _Bookmarks extends StatelessWidget {
   }
 }
 
-/// A surah row with its memorization level.
+/// A surah row: number in a star, name and meaning, the Arabic name in
+/// calligraphy, and the memorization level.
 class SurahTile extends StatelessWidget {
   const SurahTile({super.key, required this.info, this.onTap});
   final SurahInfo info;
@@ -117,17 +135,51 @@ class SurahTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final mastery = AppScope.of(context).progress.mastery(info);
     final scheme = Theme.of(context).colorScheme;
-    return ListTile(
-      minVerticalPadding: 12,
-      leading: CircleAvatar(
-        backgroundColor: mastery == Mastery.none ? scheme.secondaryContainer : masteryColor(context, mastery),
-        foregroundColor: mastery == Mastery.none || mastery == Mastery.started ? scheme.onSecondaryContainer : Colors.white,
-        child: Text(isArabicUi(context) ? arabicNumber(info.number) : '${info.number}'),
-      ),
-      title: Text(info.name, style: const TextStyle(fontFamily: quranFont, fontSize: 22)),
-      subtitle: Text(surahSubtitle(context, info)),
-      trailing: mastery.index >= Mastery.memorized.index ? Icon(Icons.verified, color: Colors.green.shade600) : null,
+    final arabic = isArabicUi(context);
+    final t = AppLocalizations.of(context);
+    final started = mastery != Mastery.none;
+    return InkWell(
       onTap: onTap ?? () => showSurahActions(context, info),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(children: [
+          StarBadge(
+            text: '${info.number}',
+            fill: started ? masteryColor(context, mastery) : null,
+            textColor: mastery.index >= Mastery.memorized.index ? Colors.white : null,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(arabic ? info.name : info.tname,
+                  style: arabic
+                      ? const TextStyle(fontFamily: titleFont, fontWeight: FontWeight.w700, fontSize: 20, height: 1.4)
+                      : Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 2),
+              Row(children: [
+                Icon(info.meccan ? Icons.mosque_outlined : Icons.location_city_outlined, size: 14, color: scheme.onSurfaceVariant),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    arabic ? surahSubtitle(context, info) : '${info.ename} · ${t.ayahCount(info.ayahs)}',
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ),
+              ]),
+            ]),
+          ),
+          if (mastery.index >= Mastery.memorized.index)
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: Icon(Icons.verified_rounded, color: scheme.primary, size: 20),
+            ),
+          if (!arabic)
+            Text(info.name,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(fontFamily: titleFont, fontWeight: FontWeight.w700, fontSize: 22, color: scheme.primary)),
+        ]),
+      ),
     );
   }
 }

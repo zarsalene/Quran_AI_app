@@ -508,7 +508,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String audioOnPhone(String mb) {
-    return 'Al-Fatiha et le Juz 30 sont inclus. Téléchargé : $mb Mo.';
+    return 'Téléchargé sur ce téléphone : $mb Mo';
   }
 
   @override
@@ -530,7 +530,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get confirmDelete =>
-      'Supprimer tout l\'audio téléchargé ? Al-Fatiha et le Juz 30 restent.';
+      'Supprimer l\'audio téléchargé de ce récitant ? L\'audio inclus dans l\'application reste.';
 
   @override
   String get cancel => 'Annuler';
@@ -550,7 +550,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get sourcesBody =>
-      'Texte du Coran : Tanzil.net (Uthmani, sans modification). Récitation : Mishary Alafasy, via quran.com. Modèle vocal : Quran-Lab (usage gratuit uniquement). Police : Amiri Quran.';
+      'Texte du Coran : Tanzil.net (Uthmani, sans modification). Récitation : Al-Husary (Muallim) et Mishary Alafasy, via quran.com. Modèle vocal : Quran-Lab (usage gratuit uniquement). Polices : Amiri Quran, Amiri, IBM Plex Sans Arabic.';
 
   @override
   String get licenses => 'Licences';
@@ -579,4 +579,47 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get start => 'Commencer';
+
+  @override
+  String get wholeSurah => 'Sourate entière';
+
+  @override
+  String get greeting => 'Assalamou alaykoum';
+
+  @override
+  String get ayahOfDay => 'Verset du jour';
+
+  @override
+  String get seeAll => 'Tout voir';
+
+  @override
+  String get startSubtitle => '7 versets courts. Le professeur écoute et aide.';
+
+  @override
+  String get more => 'Plus';
+
+  @override
+  String get chooseLanguage => 'Choisissez votre langue';
+
+  @override
+  String get reciterHusary => 'Mahmoud Khalil Al-Husary (enseignement)';
+
+  @override
+  String get reciterHusaryHelp =>
+      'Lent et précis. Une pause après chaque verset pour répéter. Idéal pour apprendre.';
+
+  @override
+  String get reciterAlafasyHelp =>
+      'Récitation fluide. Téléchargement par sourate.';
+
+  @override
+  String get bundledNote =>
+      'Al-Fatiha et le Juz 30 sont inclus dans l\'application.';
+
+  @override
+  String get tapWordHint =>
+      'Touchez un mot pour l\'écouter. Touchez le numéro du verset pour plus.';
+
+  @override
+  String get reciterHusaryShort => 'Al-Husary (enseignement)';
 }

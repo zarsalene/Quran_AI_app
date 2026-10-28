@@ -188,7 +188,7 @@ class _TeacherViewState extends State<TeacherView> {
     if (phase == TeacherPhase.finished) widget.onFinished?.call();
   }
 
-  bool get _canPlay => _services.audio.isAvailable(c.layout.surah.number);
+  bool get _canPlay => _services.wordAudio(c.layout.surah.number) != null;
 
   /// The model answer: the reciter says the word the reader got wrong.
   Future<void> playStopWord() async {
@@ -197,7 +197,8 @@ class _TeacherViewState extends State<TeacherView> {
     final inAyah = c.layout.wordInAyah(w);
     if (inAyah < 0) return;
     try {
-      await _services.player.playWord(c.layout.surah.number, c.layout.wordAyah[w], inAyah);
+      await _services.player.playWord(c.layout.surah.number, c.layout.wordAyah[w], inAyah,
+          from: _services.wordAudio(c.layout.surah.number));
     } catch (_) {
       // Audio is a help, never a blocker.
     }
@@ -218,9 +219,17 @@ class _TeacherViewState extends State<TeacherView> {
             onListenWord: _canPlay ? playStopWord : null,
             finishedAction: widget.finishedAction,
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Text(t.disclaimer, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
+          ColoredBox(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text(t.disclaimer,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              ),
+            ),
           ),
         ],
       ),
@@ -236,10 +245,11 @@ class _ModePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: Column(
         children: [
           SegmentedButton<TeacherMode>(
+            style: SegmentedButton.styleFrom(visualDensity: VisualDensity.compact),
             segments: [
               ButtonSegment(value: TeacherMode.strict, label: Text(t.modeStrict), icon: const Icon(Icons.pan_tool)),
               ButtonSegment(value: TeacherMode.gentle, label: Text(t.modeGentle), icon: const Icon(Icons.edit_note)),
@@ -291,17 +301,30 @@ class _SurahText extends StatelessWidget {
         spans.add(_Word(word: word, index: w, c: c, style: base));
         w++;
       }
-      spans.add(_AyahNumber(ayah.number));
+      spans.add(AyahEndMarker(number: ayah.number, size: size * 0.9));
       children.add(Wrap(
         textDirection: TextDirection.rtl,
-        spacing: 8,
+        spacing: 4,
+        runSpacing: 2,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: spans,
       ));
     }
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          ...children,
+          const SizedBox(height: 10),
+          const _Legend(),
+        ]),
+      ),
     );
   }
 }
@@ -322,19 +345,23 @@ class _Word extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final color = visible ? _color(r, isStop) : Colors.transparent;
     final text = word.mark == null ? word.text : '${word.text} ${word.mark}';
+    final tint = isStop ? RattilColors.mistake : (visible ? color : null);
     return Semantics(
       label: visible ? r?.status.name : AppLocalizations.of(context).hiddenWord,
       child: InkWell(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         onTap: r == null || r.issues.isEmpty || !visible ? null : () => _showIssues(context, r),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
           constraints: const BoxConstraints(minHeight: 48),
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          decoration: isStop
-              ? BoxDecoration(color: Colors.red.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8))
-              : !visible
-                  ? BoxDecoration(color: scheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8))
-                  : null,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: !visible
+                ? scheme.surfaceContainerHighest
+                : tint?.withValues(alpha: isStop ? 0.16 : 0.09),
+            border: isStop ? Border.all(color: RattilColors.mistake, width: 1.5) : null,
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Text(text, textDirection: TextDirection.rtl, style: style.copyWith(color: color)),
         ),
       ),
@@ -342,14 +369,14 @@ class _Word extends StatelessWidget {
   }
 
   Color? _color(WordResult? r, bool isStop) {
-    if (isStop) return Colors.red.shade700;
-    if (c.peeked.contains(index) && (r == null || r.status == WordStatus.pending)) return Colors.blueGrey;
+    if (isStop) return RattilColors.mistake;
+    if (c.peeked.contains(index) && (r == null || r.status == WordStatus.pending)) return RattilColors.unsure;
     if (r == null) return null;
     return switch (r.status) {
       WordStatus.pending => null,
-      WordStatus.correct => r.hasMedium ? Colors.orange.shade800 : Colors.green.shade700,
-      WordStatus.unsure => Colors.blueGrey,
-      WordStatus.wrong || WordStatus.skipped || WordStatus.jumped => Colors.red.shade700,
+      WordStatus.correct => r.hasMedium ? RattilColors.check : RattilColors.correct,
+      WordStatus.unsure => RattilColors.unsure,
+      WordStatus.wrong || WordStatus.skipped || WordStatus.jumped => RattilColors.mistake,
     };
   }
 
@@ -387,20 +414,23 @@ String issueLabel(AppLocalizations t, IssueType type) => switch (type) {
         t.issueTajweed,
     };
 
-class _AyahNumber extends StatelessWidget {
-  const _AyahNumber(this.number);
-  final int number;
+/// What the colors mean, under the text.
+class _Legend extends StatelessWidget {
+  const _Legend();
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: 34,
-      height: 34,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: scheme.primary, width: 1.5)),
-      child: Text('$number', style: TextStyle(fontSize: 13, color: scheme.primary)),
-    );
+    final t = AppLocalizations.of(context);
+    Widget dot(Color c, String label) => Row(mainAxisSize: MainAxisSize.min, children: [
+          Container(width: 10, height: 10, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+          const SizedBox(width: 5),
+          Text(label, style: Theme.of(context).textTheme.labelSmall),
+        ]);
+    return Wrap(alignment: WrapAlignment.center, spacing: 14, runSpacing: 4, children: [
+      dot(RattilColors.correct, t.legendCorrect),
+      dot(RattilColors.check, t.legendCheck),
+      dot(RattilColors.mistake, t.legendMistake),
+    ]);
   }
 }
 
@@ -454,42 +484,67 @@ class _BottomPanel extends StatelessWidget {
     }
     final listening = c.phase == TeacherPhase.listening;
     final canMic = c.phase == TeacherPhase.ready || listening;
-    return Material(
-      elevation: 3,
-      color: theme.colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-        child: Column(
-          children: [
-            Text(message,
-                textAlign: TextAlign.center,
-                style: c.phase == TeacherPhase.finished && c.perfect
-                    ? theme.textTheme.headlineSmall?.copyWith(color: Colors.green.shade700)
-                    : theme.textTheme.titleMedium),
-            const SizedBox(height: 12),
-            if (actions.isNotEmpty) Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: actions),
-            if (canMic)
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                if (c.hidden)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(end: 24),
-                    child: OutlinedButton.icon(onPressed: c.peek, icon: const Icon(Icons.lightbulb_outline), label: Text(t.hint)),
-                  ),
-                SizedBox(
-                  width: 72,
-                  height: 72,
+    final scheme = theme.colorScheme;
+    final (icon, tone) = switch (c.phase) {
+      TeacherPhase.stopped => (Icons.error_outline_rounded, RattilColors.mistake),
+      TeacherPhase.finished => c.perfect ? (Icons.verified_rounded, RattilColors.correct) : (Icons.task_alt_rounded, RattilColors.check),
+      TeacherPhase.listening => c.noisy ? (Icons.volume_off_rounded, RattilColors.check) : (Icons.graphic_eq_rounded, scheme.primary),
+      TeacherPhase.error => (Icons.error_outline_rounded, RattilColors.mistake),
+      _ => (Icons.mic_none_rounded, scheme.onSurfaceVariant),
+    };
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainer,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        border: Border(top: BorderSide(color: scheme.outlineVariant)),
+        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 16, offset: Offset(0, -4))],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, color: tone, size: 22),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(message,
+                  textAlign: TextAlign.center,
+                  style: c.phase == TeacherPhase.finished && c.perfect
+                      ? theme.textTheme.titleLarge?.copyWith(color: RattilColors.correct)
+                      : theme.textTheme.titleSmall?.copyWith(color: c.phase == TeacherPhase.stopped ? RattilColors.mistake : null)),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          if (actions.isNotEmpty) Wrap(spacing: 10, runSpacing: 8, alignment: WrapAlignment.center, children: actions),
+          if (canMic)
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              SizedBox(
+                width: 96,
+                child: c.hidden
+                    ? TextButton.icon(onPressed: c.peek, icon: const Icon(Icons.lightbulb_outline_rounded), label: Text(t.hint))
+                    : null,
+              ),
+              PulseRings(
+                active: listening,
+                color: listening ? RattilColors.mistake : scheme.primary,
+                size: 112,
+                child: SizedBox.square(
+                  dimension: 76,
                   child: FloatingActionButton.large(
                     heroTag: null,
+                    elevation: 2,
+                    shape: const CircleBorder(),
                     onPressed: onMic,
-                    backgroundColor: listening ? Colors.red.shade600 : theme.colorScheme.primary,
+                    backgroundColor: listening ? RattilColors.mistake : scheme.primary,
                     foregroundColor: Colors.white,
                     tooltip: listening ? t.listening : t.tapToStart,
-                    child: Icon(listening ? Icons.stop : Icons.mic, size: 36),
+                    child: Icon(listening ? Icons.stop_rounded : Icons.mic_rounded, size: 38),
                   ),
                 ),
-              ]),
-          ],
-        ),
+              ),
+              const SizedBox(width: 96),
+            ]),
+        ],
       ),
     );
   }

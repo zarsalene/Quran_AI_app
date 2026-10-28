@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -140,14 +139,16 @@ class _AyahTile extends StatefulWidget {
 }
 
 class _AyahTileState extends State<_AyahTile> {
-  late final _tap = TapGestureRecognizer()..onTap = _actions;
+  late final _taps = wordRecognizers(context, widget.surah.number, widget.ayah);
 
   void _actions() =>
       showAyahActions(context, widget.surah.number, widget.ayah.number, surahAyahs: widget.surah.ayahs.length);
 
   @override
   void dispose() {
-    _tap.dispose();
+    for (final r in _taps) {
+      r.dispose();
+    }
     super.dispose();
   }
 
@@ -158,25 +159,66 @@ class _AyahTileState extends State<_AyahTile> {
     final playing = isPlaying(p, widget.surah.number, widget.ayah.number);
     final marked = s.progress.isBookmarked(widget.surah.number, widget.ayah.number);
     final scheme = Theme.of(context).colorScheme;
-    return InkWell(
-      onTap: _actions,
-      child: Container(
-        color: playing ? scheme.primaryContainer.withValues(alpha: 0.35) : null,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, textDirection: TextDirection.rtl, children: [
-          Expanded(
-            child: Text.rich(
-              TextSpan(
-                children: ayahSpans(context, widget.ayah,
-                    style: quranStyle(context), playingWord: p.word, playingAyah: playing, recognizer: _tap),
-              ),
-              textDirection: TextDirection.rtl,
-              textAlign: TextAlign.justify,
-            ),
-          ),
-          if (marked) Padding(padding: const EdgeInsets.only(top: 12), child: Icon(Icons.bookmark, color: scheme.primary, size: 20)),
-        ]),
+    final t = AppLocalizations.of(context);
+    final n = widget.ayah.number;
+    final sn = widget.surah.number;
+    return Container(
+      decoration: BoxDecoration(
+        color: playing ? scheme.secondaryContainer.withValues(alpha: 0.35) : null,
+        border: Border(bottom: BorderSide(color: scheme.outlineVariant)),
       ),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(color: scheme.surfaceContainerHigh, borderRadius: BorderRadius.circular(10)),
+            child: Text('$sn:$n', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
+          ),
+          const Spacer(),
+          if (s.audio.isAvailable(sn))
+            IconButton(
+              tooltip: t.playFromHere,
+              visualDensity: VisualDensity.compact,
+              icon: Icon(playing && p.playing ? Icons.pause_circle_outline_rounded : Icons.play_circle_outline_rounded,
+                  color: scheme.primary),
+              onPressed: () {
+                if (playing && p.playing) {
+                  p.pause();
+                  return;
+                }
+                s.progress.addListened();
+                s.player.playRange(sn, n, widget.surah.ayahs.length).catchError((Object _) {});
+              },
+            ),
+          IconButton(
+            tooltip: marked ? t.bookmarkRemove : t.bookmarkAdd,
+            visualDensity: VisualDensity.compact,
+            icon: Icon(marked ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                color: marked ? scheme.secondary : scheme.onSurfaceVariant),
+            onPressed: () => s.progress.toggleBookmark(sn, n),
+          ),
+          IconButton(
+            tooltip: t.more,
+            visualDensity: VisualDensity.compact,
+            icon: Icon(Icons.more_horiz_rounded, color: scheme.onSurfaceVariant),
+            onPressed: _actions,
+          ),
+        ]),
+        const SizedBox(height: 4),
+        Text.rich(
+          TextSpan(
+            children: ayahSpans(context, widget.ayah,
+                style: quranStyle(context),
+                playingWord: heardWord(p, sn, n),
+                playingAyah: playing,
+                wordTaps: _taps,
+                onMarker: _actions),
+          ),
+          textDirection: TextDirection.rtl,
+          textAlign: TextAlign.justify,
+        ),
+      ]),
     );
   }
 }

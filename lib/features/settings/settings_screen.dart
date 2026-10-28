@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app_scope.dart';
 import '../../core/align/session.dart';
+import '../../core/audio/audio_catalog.dart';
 import '../../l10n/app_localizations.dart';
 import '../common.dart';
 import '../home/home_screen.dart';
@@ -84,10 +85,18 @@ class SettingsScreen extends StatelessWidget {
             ]),
           ),
           _Section(t.settingsAudio),
+          RadioGroup<Reciter>(
+            groupValue: st.reciter,
+            onChanged: (v) => st.reciter = v!,
+            child: Column(children: [
+              RadioListTile(value: Reciter.husaryMuallim, title: Text(t.reciterHusary), subtitle: Text(t.reciterHusaryHelp)),
+              RadioListTile(value: Reciter.alafasy, title: Text(t.reciterName), subtitle: Text(t.reciterAlafasyHelp)),
+            ]),
+          ),
           ListTile(
-            leading: const Icon(Icons.record_voice_over),
-            title: Text(t.reciterName),
-            subtitle: Text(t.audioOnPhone((s.audio.downloadedBytes() / 1e6).toStringAsFixed(0))),
+            leading: const Icon(Icons.sd_storage_outlined),
+            title: Text(t.audioOnPhone((s.audio.downloadedBytes() / 1e6).toStringAsFixed(0))),
+            subtitle: s.audio.reciter.bundled ? Text(t.bundledNote) : null,
           ),
           if (s.audio.missingBytes() > 0)
             ListTile(

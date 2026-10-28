@@ -1,16 +1,19 @@
-"""Download the bundled recitation audio into assets/audio/ and verify it.
+"""Download the bundled recitation audio into assets/audio/<reciter>/ and verify it.
 
-    python tool/fetch_audio.py --pin    # after the audio source changes
+    python tool/fetch_audio.py husary_muallim --pin    # after the audio source changes
 
 The encoded MP3s are committed, so builds do not run this script. Run it only
-to change the bundled audio, then commit assets/audio/ and data/AUDIO_CHECKSUMS.
+to change the bundled audio, then commit assets/audio/ and data/AUDIO_CHECKSUMS.*.
 
-Bundled: Al-Fatiha and Juz 30 (surahs 78-114), Alafasy, so a new user can
-listen and learn with no internet. Other surahs download in the app.
+Bundled: Al-Fatiha and Juz 30 (surahs 78-114) by Al-Husary (Muallim, the
+teaching recording), so a new user can listen, learn, and hear the correct
+word at a teacher stop with no internet. Other surahs and reciters download in
+the app.
 
-Each source MP3 is pinned by SHA-256 in data/AUDIO_CHECKSUMS, then re-encoded
-to 40 kbps mono (about 17 MB in total instead of 62 MB). Re-encoding keeps the
-duration, so the word timings in assets/quran/audio_alafasy.json still match.
+Each source MP3 is pinned by SHA-256 in data/AUDIO_CHECKSUMS.<reciter>, then
+re-encoded to 32 kbps mono (speech stays clear; about 22 MB in total).
+Re-encoding keeps the duration, so the word timings in
+assets/quran/audio_<reciter>.json still match.
 """
 
 import hashlib
@@ -22,10 +25,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TIMINGS = ROOT / "assets" / "quran" / "audio_alafasy.json"
-PINS = ROOT / "data" / "AUDIO_CHECKSUMS"
 CACHE = ROOT / "build" / "audio-src"
-DEST = ROOT / "assets" / "audio"
 BUNDLED = [1, *range(78, 115)]
 
 
@@ -46,20 +46,26 @@ def ffmpeg() -> str:
 
 
 def main() -> int:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    key = args[0] if args else "husary_muallim"
     pin = "--pin" in sys.argv
-    urls = {s["s"]: s["url"] for s in json.loads(TIMINGS.read_text(encoding="utf-8"))["surahs"]}
+    timings = ROOT / "assets" / "quran" / f"audio_{key}.json"
+    pins_file = ROOT / "data" / f"AUDIO_CHECKSUMS.{key}"
+    dest = ROOT / "assets" / "audio" / key
+    cache = CACHE / key
+    urls = {s["s"]: s["url"] for s in json.loads(timings.read_text(encoding="utf-8"))["surahs"]}
     pins = {}
     if not pin:
-        for line in PINS.read_text(encoding="utf-8").splitlines():
+        for line in pins_file.read_text(encoding="utf-8").splitlines():
             digest, name = line.split(maxsplit=1)
             pins[name.lstrip("*")] = digest
-    CACHE.mkdir(parents=True, exist_ok=True)
-    DEST.mkdir(parents=True, exist_ok=True)
+    cache.mkdir(parents=True, exist_ok=True)
+    dest.mkdir(parents=True, exist_ok=True)
     exe = ffmpeg()
     out_pins = []
     for s in BUNDLED:
         name = f"s{s:03d}.mp3"
-        src = CACHE / name
+        src = cache / name
         if not src.exists() or (not pin and sha256(src) != pins[name]):
             print(f"fetch   {name}", flush=True)
             req = urllib.request.Request(urls[s], headers={"User-Agent": "rattil-build/1.0"})
@@ -70,21 +76,21 @@ def main() -> int:
             print(f"FAIL    {name}: sha256 {got}, expected {pins[name]}", file=sys.stderr)
             return 1
         out_pins.append(f"{got} *{name}")
-        out = DEST / name
-        stamp = CACHE / f"{name}.encoded"  # outside assets/, so it never ships
+        out = dest / name
+        stamp = cache / f"{name}.encoded"  # outside assets/, so it never ships
         if out.exists() and stamp.exists() and stamp.read_text() == got:
             print(f"ok      {name}")
             continue
         subprocess.run(
             [exe, "-loglevel", "error", "-y", "-i", str(src), "-map_metadata", "-1", "-vn",
-             "-ac", "1", "-ar", "24000", "-b:a", "40k", str(out)],
+             "-ac", "1", "-ar", "22050", "-b:a", "32k", str(out)],
             check=True,
         )
         stamp.write_text(got)
-        print(f"encode  {name}  {out.stat().st_size / 1e6:.1f} MB", flush=True)
+        print(f"encode  {name}  {out.stat().st_size / 1e6:.2f} MB", flush=True)
     if pin:
-        PINS.write_text("\n".join(out_pins) + "\n", encoding="utf-8")
-        print(f"pinned {len(out_pins)} files in {PINS.relative_to(ROOT)}")
+        pins_file.write_text("\n".join(out_pins) + "\n", encoding="utf-8")
+        print(f"pinned {len(out_pins)} files in {pins_file.relative_to(ROOT)}")
     return 0
 
 

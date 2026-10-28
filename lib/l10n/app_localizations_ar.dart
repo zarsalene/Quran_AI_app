@@ -516,7 +516,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String audioOnPhone(String mb) {
-    return 'الفاتحة وجزء عمّ مضمّنان. المُنزَّل: $mb م.ب.';
+    return 'المُنزَّل على هذا الهاتف: $mb م.ب';
   }
 
   @override
@@ -537,7 +537,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteDownloads => 'احذف الصوت المُنزَّل';
 
   @override
-  String get confirmDelete => 'حذف كل الصوت المُنزَّل؟ تبقى الفاتحة وجزء عمّ.';
+  String get confirmDelete =>
+      'حذف الصوت المُنزَّل لهذا القارئ؟ يبقى الصوت المضمّن في التطبيق.';
 
   @override
   String get cancel => 'إلغاء';
@@ -556,7 +557,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sourcesBody =>
-      'نص القرآن: موقع تنزيل (الرسم العثماني، دون تغيير). التلاوة: مشاري العفاسي عبر quran.com. نموذج الصوت: Quran-Lab (للاستخدام المجاني فقط). الخط: Amiri Quran.';
+      'نص القرآن: موقع تنزيل (الرسم العثماني، دون تغيير). التلاوة: الحصري (المصحف المعلّم) ومشاري العفاسي عبر quran.com. نموذج الصوت: Quran-Lab (للاستخدام المجاني فقط). الخطوط: Amiri Quran وAmiri وIBM Plex Sans Arabic.';
 
   @override
   String get licenses => 'التراخيص';
@@ -582,4 +583,45 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get start => 'ابدأ';
+
+  @override
+  String get wholeSurah => 'السورة كاملة';
+
+  @override
+  String get greeting => 'السلام عليكم';
+
+  @override
+  String get ayahOfDay => 'آية اليوم';
+
+  @override
+  String get seeAll => 'عرض الكل';
+
+  @override
+  String get startSubtitle => 'سبع آيات قصيرة. المعلّم يستمع ويساعد.';
+
+  @override
+  String get more => 'المزيد';
+
+  @override
+  String get chooseLanguage => 'اختر لغتك';
+
+  @override
+  String get reciterHusary => 'محمود خليل الحصري (المصحف المعلّم)';
+
+  @override
+  String get reciterHusaryHelp =>
+      'قراءة متأنية دقيقة، مع وقفة بعد كل آية للترديد. الأفضل للتعلّم.';
+
+  @override
+  String get reciterAlafasyHelp =>
+      'تلاوة مرتّلة متصلة. تُنزَّل كل سورة على حدة.';
+
+  @override
+  String get bundledNote => 'الفاتحة وجزء عمّ مضمّنان في التطبيق.';
+
+  @override
+  String get tapWordHint => 'اضغط على كلمة لتسمعها. اضغط على رقم الآية للمزيد.';
+
+  @override
+  String get reciterHusaryShort => 'الحصري (المعلّم)';
 }

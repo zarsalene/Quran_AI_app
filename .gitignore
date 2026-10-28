@@ -29,3 +29,4 @@ assets/models/*.onnx
 assets/models/tokens.txt
 assets/models/ASR_LICENSE.txt
 
+test/screenshots/out/

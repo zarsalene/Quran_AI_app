@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../app_scope.dart';
 import '../../core/progress/progress_store.dart';
-import '../../core/quran/arabic.dart';
 import '../../core/quran/quran_repo.dart';
 import '../../l10n/app_localizations.dart';
 import '../common.dart';
@@ -145,24 +144,39 @@ class _PageState extends State<_Page> {
           }
           final spans = <InlineSpan>[];
           for (final a in ayahs) {
-            final tap = TapGestureRecognizer()
-              ..onTap = () => showAyahActions(context, surah.number, a.number, surahAyahs: surah.ayahs.length);
-            _taps.add(tap);
+            final taps = wordRecognizers(context, surah.number, a);
+            _taps.addAll(taps);
             spans.addAll(ayahSpans(context, a,
                 style: style,
-                playingWord: s.player.word,
+                playingWord: heardWord(s.player, surah.number, a.number),
                 playingAyah: isPlaying(s.player, surah.number, a.number),
-                recognizer: tap));
+                wordTaps: taps,
+                onMarker: () => showAyahActions(context, surah.number, a.number, surahAyahs: surah.ayahs.length)));
           }
           children.add(Text.rich(TextSpan(children: spans), textDirection: TextDirection.rtl, textAlign: TextAlign.justify));
         }
         children.add(Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Text(arabicNumber(widget.page), textAlign: TextAlign.center, style: TextStyle(color: scheme.outline)),
+          padding: const EdgeInsets.only(top: 14),
+          child: Center(child: AyahEndMarker(number: widget.page, size: 26)),
         ));
         return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+          padding: const EdgeInsets.fromLTRB(10, 6, 10, 16),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              border: Border.all(color: scheme.secondary, width: 1.4),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerLow,
+                border: Border.all(color: scheme.secondary.withValues(alpha: 0.5), width: 0.8),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+            ),
+          ),
         );
       },
     );

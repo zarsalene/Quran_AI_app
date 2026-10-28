@@ -6,12 +6,15 @@ import '../core/progress/progress_store.dart';
 import '../core/quran/arabic.dart';
 import '../core/quran/quran_repo.dart';
 import '../l10n/app_localizations.dart';
+import '../ui/ornaments.dart';
+import '../ui/theme.dart';
 import 'hifz/memorize_screen.dart';
 import 'reader/mushaf_screen.dart';
 import 'reader/reader_screen.dart';
 import 'teacher/recite_screen.dart';
 
-const quranFont = 'AmiriQuran';
+export '../ui/ornaments.dart';
+export '../ui/theme.dart';
 
 /// Al-Fatiha, then Juz 30 from its shortest surahs at the end, so a new
 /// reader gets quick wins first.
@@ -92,6 +95,7 @@ class _SurahActionsSheetState extends State<_SurahActionsSheet> {
       }
     }
 
+    final scheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
@@ -99,11 +103,20 @@ class _SurahActionsSheetState extends State<_SurahActionsSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(info.name, textAlign: TextAlign.center, style: const TextStyle(fontFamily: quranFont, fontSize: 32)),
-            Text(surahSubtitle(context, info), textAlign: TextAlign.center),
+            SurahBanner(name: info.name, subtitle: surahSubtitle(context, info)),
             if (info.ayahs > 1) ...[
-              const SizedBox(height: 12),
-              Text(rangeLabel(t, from, to), textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Row(children: [
+                Icon(Icons.format_list_numbered_rtl, color: scheme.secondary, size: 20),
+                const SizedBox(width: 8),
+                Text(rangeLabel(t, from, to), style: Theme.of(context).textTheme.titleSmall),
+                const Spacer(),
+                if (from != 1 || to != info.ayahs)
+                  TextButton(
+                    onPressed: () => setState(() => _range = RangeValues(1, info.ayahs.toDouble())),
+                    child: Text(t.wholeSurah),
+                  ),
+              ]),
               RangeSlider(
                 values: _range,
                 min: 1,
@@ -113,13 +126,20 @@ class _SurahActionsSheetState extends State<_SurahActionsSheet> {
                 onChanged: (v) => setState(() => _range = v),
               ),
             ],
-            const SizedBox(height: 8),
-            _ActionButton(icon: Icons.mic, label: t.actionRecite, help: t.reciteHelp, primary: true,
+            const SizedBox(height: 4),
+            _ActionButton(icon: Icons.mic_rounded, label: t.actionRecite, help: t.reciteHelp, primary: true,
                 onTap: () => go(SurahAction.recite)),
-            _ActionButton(icon: Icons.psychology_alt, label: t.actionMemorize, help: t.memorizeHelp,
-                onTap: () => go(SurahAction.memorize)),
-            _ActionButton(icon: Icons.menu_book, label: t.actionRead, help: t.readHelp,
-                onTap: () => go(SurahAction.read)),
+            Row(children: [
+              Expanded(
+                child: _ActionButton(icon: Icons.school_rounded, label: t.actionMemorize, help: t.memorizeHelp,
+                    onTap: () => go(SurahAction.memorize)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _ActionButton(icon: Icons.auto_stories_rounded, label: t.actionRead, help: t.readHelp,
+                    onTap: () => go(SurahAction.read)),
+              ),
+            ]),
           ],
         ),
       ),
@@ -140,31 +160,42 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final fg = primary ? Colors.white : scheme.onSurface;
+    final content = primary
+        ? Row(children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), shape: BoxShape.circle),
+              child: Icon(icon, size: 28, color: Colors.white),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(label, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: fg)),
+                Text(help, style: TextStyle(fontSize: 13, color: fg.withValues(alpha: 0.85))),
+              ]),
+            ),
+            Icon(Icons.arrow_forward_rounded, color: fg),
+          ])
+        : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Icon(icon, size: 26, color: scheme.primary),
+            const SizedBox(height: 8),
+            Text(label, style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700, color: fg)),
+            Text(help, maxLines: 2, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
+          ]);
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: 10),
       child: Material(
         color: primary ? scheme.primary : scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
           onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(children: [
-              Icon(icon, size: 28, color: primary ? scheme.onPrimary : scheme.primary),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(label,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: primary ? scheme.onPrimary : null, fontWeight: FontWeight.w600)),
-                  Text(help,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: primary ? scheme.onPrimary.withValues(alpha: 0.85) : null)),
-                ]),
-              ),
-            ]),
-          ),
+          child: Stack(children: [
+            if (primary) const Positioned.fill(child: StarPattern(opacity: 0.06, cell: 36)),
+            Padding(padding: const EdgeInsets.all(16), child: content),
+          ]),
         ),
       ),
     );
@@ -177,22 +208,7 @@ class SurahHeader extends StatelessWidget {
   final SurahInfo info;
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-      decoration: BoxDecoration(
-        color: scheme.primaryContainer.withValues(alpha: 0.5),
-        border: Border.all(color: scheme.primary.withValues(alpha: 0.6)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text('سُورَةُ ${info.name}',
-          textAlign: TextAlign.center,
-          textDirection: TextDirection.rtl,
-          style: TextStyle(fontFamily: quranFont, fontSize: 24, color: scheme.onPrimaryContainer)),
-    );
-  }
+  Widget build(BuildContext context) => SurahBanner(name: info.name, subtitle: surahSubtitle(context, info));
 }
 
 /// Mastery colors, from not started to strong.
@@ -200,9 +216,9 @@ Color masteryColor(BuildContext context, Mastery m) {
   final scheme = Theme.of(context).colorScheme;
   return switch (m) {
     Mastery.none => scheme.surfaceContainerHighest,
-    Mastery.started => Colors.amber.shade400,
-    Mastery.memorized => Colors.green.shade400,
-    Mastery.strong => Colors.green.shade800,
+    Mastery.started => RattilColors.goldLight,
+    Mastery.memorized => RattilColors.emeraldLight,
+    Mastery.strong => RattilColors.emerald,
   };
 }
 

@@ -74,14 +74,32 @@ class MissingAudio extends AudioLocation {
   const MissingAudio();
 }
 
-/// Alafasy recitation: bundled surahs, downloads, and word timings.
+/// A recitation the app can play. Each has word timings from quran.com.
+enum Reciter {
+  /// Al-Husary, the teaching recording: slow and exact, with a pause after
+  /// each ayah to repeat. Al-Fatiha and Juz 30 ship in the APK.
+  husaryMuallim('husary_muallim', bundled: true),
+
+  /// Mishary Alafasy, murattal. Downloads per surah.
+  alafasy('alafasy');
+
+  const Reciter(this.key, {this.bundled = false});
+  final String key;
+
+  /// Al-Fatiha and Juz 30 are in the APK (tool/fetch_audio.py).
+  final bool bundled;
+}
+
+/// One reciter's recitation: bundled surahs, downloads, and word timings.
 class AudioCatalog extends ChangeNotifier {
-  AudioCatalog({AssetBundle? bundle, Future<Directory> Function()? storageDir})
+  AudioCatalog(this.reciter, {AssetBundle? bundle, Future<Directory> Function()? storageDir})
       : _bundle = bundle ?? rootBundle,
         _storageDir = storageDir ?? getApplicationSupportDirectory;
 
-  /// Shipped in the APK by tool/fetch_audio.py: Al-Fatiha and Juz 30.
-  static final bundled = {1, for (var s = 78; s <= 114; s++) s};
+  /// Surahs shipped in the APK for a bundled reciter: Al-Fatiha and Juz 30.
+  static final bundledSurahs = {1, for (var s = 78; s <= 114; s++) s};
+
+  final Reciter reciter;
 
   final AssetBundle _bundle;
   final Future<Directory> Function() _storageDir;
@@ -95,7 +113,7 @@ class AudioCatalog extends ChangeNotifier {
 
   Future<void> load() async {
     if (_surahs != null) return;
-    final j = jsonDecode(await _bundle.loadString('assets/quran/audio_alafasy.json')) as Map<String, dynamic>;
+    final j = jsonDecode(await _bundle.loadString('assets/quran/audio_${reciter.key}.json')) as Map<String, dynamic>;
     _surahs = {
       for (final s in j['surahs'] as List)
         (s as Map<String, dynamic>)['s'] as int: SurahAudio(
@@ -110,7 +128,7 @@ class AudioCatalog extends ChangeNotifier {
           ],
         ),
     };
-    final dir = Directory('${(await _storageDir()).path}/audio/alafasy');
+    final dir = Directory('${(await _storageDir()).path}/audio/${reciter.key}');
     await dir.create(recursive: true);
     _dir = dir;
     for (final f in dir.listSync().whereType<File>()) {
@@ -126,7 +144,9 @@ class AudioCatalog extends ChangeNotifier {
   File _file(int s) => File('${_dir!.path}/s${s.toString().padLeft(3, '0')}.mp3');
 
   AudioLocation location(int s) {
-    if (bundled.contains(s)) return BundledAudio('assets/audio/s${s.toString().padLeft(3, '0')}.mp3');
+    if (reciter.bundled && bundledSurahs.contains(s)) {
+      return BundledAudio('assets/audio/${reciter.key}/s${s.toString().padLeft(3, '0')}.mp3');
+    }
     if (_downloaded.contains(s)) return DownloadedAudio(_file(s).path);
     return const MissingAudio();
   }

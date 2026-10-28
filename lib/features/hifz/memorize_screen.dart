@@ -121,46 +121,49 @@ class _MemorizeScreenState extends State<MemorizeScreen> {
         title: Text(info.name, style: const TextStyle(fontFamily: quranFont, fontSize: 24)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(52),
-          child: _Steps(step: _step, label: rangeLabel(t, _ayah, _ayah), count: '${_ayah - widget.from + 1}/${widget.to - widget.from + 1}'),
+          child: _Steps(
+            step: _step,
+            label: rangeLabel(t, _ayah, _ayah),
+            count: '${_ayah - widget.from + 1}/${widget.to - widget.from + 1}',
+          ),
         ),
       ),
       body: c == null || surah == null
           ? const Center(child: CircularProgressIndicator())
           : switch (_step) {
               _Step.listen => _ListenStep(
-                  surah: surah,
-                  ayah: surah.ayahs[_ayah - 1],
-                  playing: _listening,
-                  onAgain: _enterListen,
-                  onNext: _enterRead,
-                ),
+                surah: surah,
+                ayah: surah.ayahs[_ayah - 1],
+                playing: _listening,
+                onAgain: _enterListen,
+                onNext: _enterRead,
+              ),
               _Step.read => TeacherView(
-                  key: const ValueKey('read'),
-                  controller: c,
-                  finishedAction: FilledButton.icon(
-                      onPressed: _enterMemory, icon: const Icon(Icons.arrow_forward), label: Text(t.next)),
-                ),
+                key: const ValueKey('read'),
+                controller: c,
+                finishedAction: FilledButton.icon(onPressed: _enterMemory, icon: const Icon(Icons.arrow_forward), label: Text(t.next)),
+              ),
               _Step.memory => TeacherView(
-                  key: const ValueKey('memory'),
-                  controller: c,
-                  finishedAction: FilledButton.icon(
-                      onPressed: _finishMemory, icon: const Icon(Icons.arrow_forward), label: Text(t.next)),
-                ),
+                key: const ValueKey('memory'),
+                controller: c,
+                finishedAction: FilledButton.icon(onPressed: _finishMemory, icon: const Icon(Icons.arrow_forward), label: Text(t.next)),
+              ),
               _Step.result => _Result(
-                  grade: _grade,
-                  card: _s.progress.card(widget.surah, _ayah),
-                  isLast: _ayah >= widget.to,
-                  onRetry: _enterMemory,
-                  onNext: _next,
-                ),
+                grade: _grade,
+                card: _s.progress.card(widget.surah, _ayah),
+                isLast: _ayah >= widget.to,
+                onRetry: _enterMemory,
+                onNext: _next,
+              ),
               _Step.connect => TeacherView(
-                  key: const ValueKey('connect'),
-                  controller: c,
-                  finishedAction: FilledButton.icon(
-                      onPressed: () => setState(() => _step = _Step.done),
-                      icon: const Icon(Icons.check),
-                      label: Text(t.finish)),
+                key: const ValueKey('connect'),
+                controller: c,
+                finishedAction: FilledButton.icon(
+                  onPressed: () => setState(() => _step = _Step.done),
+                  icon: const Icon(Icons.check),
+                  label: Text(t.finish),
                 ),
+              ),
               _Step.done => _Done(onClose: () => Navigator.of(context).pop()),
             },
     );
@@ -184,25 +187,27 @@ class _Steps extends StatelessWidget {
       _Step.connect || _Step.done => 3,
     };
     Widget chip(int i, String text) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3),
-          child: Chip(
-            visualDensity: VisualDensity.compact,
-            label: Text(text),
-            backgroundColor: i == current ? scheme.primary : null,
-            labelStyle: TextStyle(color: i == current ? scheme.onPrimary : null, fontSize: 12),
-          ),
-        );
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: Chip(
+        visualDensity: VisualDensity.compact,
+        label: Text(text),
+        backgroundColor: i == current ? scheme.primary : null,
+        labelStyle: TextStyle(color: i == current ? scheme.onPrimary : null, fontSize: 12),
+      ),
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Row(children: [
-          Text('$label  $count  ', style: Theme.of(context).textTheme.labelLarge),
-          chip(0, t.stepListen),
-          chip(1, t.stepRead),
-          chip(2, t.stepMemory),
-        ]),
+        child: Row(
+          children: [
+            Text('$label  $count  ', style: Theme.of(context).textTheme.labelLarge),
+            chip(0, t.stepListen),
+            chip(1, t.stepRead),
+            chip(2, t.stepMemory),
+          ],
+        ),
       ),
     );
   }
@@ -221,54 +226,75 @@ class _ListenStep extends StatelessWidget {
     final t = AppLocalizations.of(context);
     final s = AppScope.of(context);
     final hasAudio = s.audio.isAvailable(surah.number);
-    return Column(children: [
-      Expanded(
-        child: ListenableBuilder(
-          listenable: s.player,
-          builder: (context, _) => SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(children: [
-              Text(hasAudio ? t.stepListenHelp : t.stepListenNoAudio,
-                  textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleMedium),
-              if (hasAudio && s.player.ayah == ayah.number)
-                Text('${s.player.repeatNumber} / 3', style: Theme.of(context).textTheme.headlineSmall),
-              const SizedBox(height: 16),
-              Text.rich(
-                TextSpan(
-                  children: ayahSpans(context, ayah,
-                      style: quranStyle(context).copyWith(fontSize: quranStyle(context).fontSize! + 4),
-                      playingWord: s.player.word,
-                      playingAyah: isPlaying(s.player, surah.number, ayah.number)),
+    return Column(
+      children: [
+        Expanded(
+          child: ListenableBuilder(
+            listenable: s.player,
+            builder: (context, _) => Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      hasAudio ? t.stepListenHelp : t.stepListenNoAudio,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if (hasAudio && s.player.ayah == ayah.number)
+                      Text('${s.player.repeatNumber} / 3', style: Theme.of(context).textTheme.headlineSmall),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.6)),
+                      ),
+                      child: TappableAyah(
+                        surah: surah.number,
+                        ayah: ayah,
+                        style: quranStyle(context).copyWith(fontSize: quranStyle(context).fontSize! + 4),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      AppLocalizations.of(context).tapWordHint,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  ],
                 ),
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.center,
               ),
-            ]),
+            ),
           ),
         ),
-      ),
-      if (!hasAudio) AudioDownloadTile(surah: surah.number),
-      SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(children: [
-            if (hasAudio)
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: playing ? null : onAgain,
-                  icon: const Icon(Icons.replay),
-                  label: Text(t.listenAgain),
+        if (!hasAudio) AudioDownloadTile(surah: surah.number),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                if (hasAudio)
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: playing ? null : onAgain,
+                      icon: const Icon(Icons.replay),
+                      label: Text(t.listenAgain),
+                    ),
+                  ),
+                if (hasAudio) const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(onPressed: onNext, icon: const Icon(Icons.arrow_forward), label: Text(t.next)),
                 ),
-              ),
-            if (hasAudio) const SizedBox(width: 12),
-            Expanded(
-              child: FilledButton.icon(onPressed: onNext, icon: const Icon(Icons.arrow_forward), label: Text(t.next)),
+              ],
             ),
-          ]),
+          ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 }
 
@@ -288,21 +314,25 @@ class _Result extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(ok ? Icons.check_circle : Icons.refresh, size: 96, color: ok ? Colors.green.shade600 : Colors.orange.shade700),
-          const SizedBox(height: 12),
-          Text(ok ? t.memorizedOk : t.notYet, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
-          if (ok) Text(t.nextReview(days), textAlign: TextAlign.center),
-          const SizedBox(height: 24),
-          Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: [
-            OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.replay), label: Text(t.tryAgain)),
-            FilledButton.icon(
-              onPressed: onNext,
-              icon: const Icon(Icons.arrow_forward),
-              label: Text(isLast ? t.finish : t.nextAyah),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(ok ? Icons.check_circle : Icons.refresh, size: 96, color: ok ? Colors.green.shade600 : Colors.orange.shade700),
+            const SizedBox(height: 12),
+            Text(ok ? t.memorizedOk : t.notYet, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+            if (ok) Text(t.nextReview(days), textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: [
+                OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.replay), label: Text(t.tryAgain)),
+                FilledButton.icon(onPressed: onNext, icon: const Icon(Icons.arrow_forward), label: Text(isLast ? t.finish : t.nextAyah)),
+              ],
             ),
-          ]),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -318,21 +348,24 @@ class _Done extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.3, end: 1),
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.elasticOut,
-            builder: (_, v, child) => Transform.scale(scale: v, child: child),
-            child: Icon(Icons.emoji_events, size: 120, color: Colors.amber.shade700),
-          ),
-          const SizedBox(height: 12),
-          Text(t.allDone, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 8),
-          Text(t.allDoneBody, textAlign: TextAlign.center),
-          const SizedBox(height: 24),
-          FilledButton(onPressed: onClose, child: Text(t.ok)),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.3, end: 1),
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.elasticOut,
+              builder: (_, v, child) => Transform.scale(scale: v, child: child),
+              child: Icon(Icons.emoji_events, size: 120, color: Colors.amber.shade700),
+            ),
+            const SizedBox(height: 12),
+            Text(t.allDone, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineMedium),
+            const SizedBox(height: 8),
+            Text(t.allDoneBody, textAlign: TextAlign.center),
+            const SizedBox(height: 24),
+            FilledButton(onPressed: onClose, child: Text(t.ok)),
+          ],
+        ),
       ),
     );
   }

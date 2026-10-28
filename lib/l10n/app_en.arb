@@ -254,7 +254,7 @@
   "settingsTeacher": "Teacher",
   "settingsGoal": "Daily goal",
   "settingsAudio": "Recitation audio",
-  "audioOnPhone": "Al-Fatiha and Juz 30 are included. Downloaded: {mb} MB.",
+  "audioOnPhone": "Downloaded on this phone: {mb} MB",
   "@audioOnPhone": {
     "placeholders": {
       "mb": {
@@ -280,13 +280,13 @@
   },
   "downloadAllHelp": "Use Wi-Fi. After this, all audio works offline.",
   "deleteDownloads": "Delete downloaded audio",
-  "confirmDelete": "Delete all downloaded audio? Al-Fatiha and Juz 30 stay.",
+  "confirmDelete": "Delete the downloaded audio of this reciter? Audio included in the app stays.",
   "cancel": "Cancel",
   "delete": "Delete",
   "settingsAbout": "About",
   "privacy": "No ads. No account. Your voice never leaves your phone.",
   "sourcesTitle": "Sources",
-  "sourcesBody": "Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Font: Amiri Quran.",
+  "sourcesBody": "Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Al-Husary (Muallim) and Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Fonts: Amiri Quran, Amiri, IBM Plex Sans Arabic.",
   "licenses": "Licenses",
   "onb1Title": "Learn the Quran with a teacher on your phone",
   "onb1Body": "Read, listen, recite, and memorize. It all works without internet.",
@@ -294,5 +294,18 @@
   "onb2Body": "Recite aloud. Each word gets a color. At a mistake, the teacher stops, plays the correct word, and you try again.",
   "onb3Title": "A small goal every day",
   "onb3Body": "How many ayahs do you want to recite each day? You can change this later.",
-  "start": "Start"
+  "start": "Start",
+  "wholeSurah": "Whole surah",
+  "greeting": "Assalamu alaykum",
+  "ayahOfDay": "Ayah of the day",
+  "seeAll": "See all",
+  "startSubtitle": "7 short ayahs. The teacher listens and helps.",
+  "more": "More",
+  "chooseLanguage": "Choose your language",
+  "reciterHusary": "Mahmoud Khalil Al-Husary (teaching)",
+  "reciterHusaryHelp": "Slow and exact. A pause after each ayah to repeat. Best to learn.",
+  "reciterAlafasyHelp": "Flowing recitation. Downloads per surah.",
+  "bundledNote": "Al-Fatiha and Juz 30 are included in the app.",
+  "tapWordHint": "Tap a word to hear it. Tap the ayah number for more.",
+  "reciterHusaryShort": "Al-Husary (teaching)"
 }

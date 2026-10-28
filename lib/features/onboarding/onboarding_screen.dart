@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app_scope.dart';
 import '../../l10n/app_localizations.dart';
+import '../common.dart';
 
 /// Three short screens: what the app does, how the teacher works, a daily goal.
 class OnboardingScreen extends StatefulWidget {
@@ -27,9 +28,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final settings = AppScope.of(context).settings;
     final scheme = Theme.of(context).colorScheme;
     final pages = [
-      _Page(icon: Icons.menu_book, title: t.onb1Title, body: t.onb1Body),
       _Page(
-        icon: Icons.record_voice_over,
+        icon: Icons.auto_stories_rounded,
+        title: t.onb1Title,
+        body: t.onb1Body,
+        extra: ListenableBuilder(
+          listenable: settings,
+          builder: (context, _) => Column(children: [
+            Text(t.chooseLanguage, style: Theme.of(context).textTheme.titleSmall),
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center, children: [
+              for (final (code, label) in [('ar', 'العربية'), ('fr', 'Français'), ('en', 'English')])
+                ChoiceChip(
+                  label: Text(label, style: const TextStyle(fontSize: 16)),
+                  selected: settings.locale?.languageCode == code ||
+                      (settings.locale == null && Localizations.localeOf(context).languageCode == code),
+                  onSelected: (_) => settings.locale = Locale(code),
+                ),
+            ]),
+          ]),
+        ),
+      ),
+      _Page(
+        icon: Icons.record_voice_over_rounded,
         title: t.onb2Title,
         body: t.onb2Body,
         extra: Column(children: [
@@ -42,7 +63,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ]),
       ),
       _Page(
-        icon: Icons.flag,
+        icon: Icons.flag_rounded,
         title: t.onb3Title,
         body: t.onb3Body,
         extra: ListenableBuilder(
@@ -110,11 +131,24 @@ class _Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(28, 48, 28, 16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       child: Column(children: [
-        CircleAvatar(radius: 56, backgroundColor: scheme.primaryContainer, child: Icon(icon, size: 56, color: scheme.primary)),
+        SizedBox(
+          height: 220,
+          child: HeroPanel(
+            padding: EdgeInsets.zero,
+            child: Center(
+              child: SizedBox.square(
+                dimension: 132,
+                child: Stack(alignment: Alignment.center, children: [
+                  const StarBadge(text: '', size: 132, fill: Color(0x22FFFFFF), stroke: RattilColors.goldLight),
+                  Icon(icon, size: 56, color: Colors.white),
+                ]),
+              ),
+            ),
+          ),
+        ),
         const SizedBox(height: 28),
         Text(title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),

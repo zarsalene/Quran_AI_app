@@ -943,7 +943,7 @@ abstract class AppLocalizations {
   /// No description provided for @audioOnPhone.
   ///
   /// In en, this message translates to:
-  /// **'Al-Fatiha and Juz 30 are included. Downloaded: {mb} MB.'**
+  /// **'Downloaded on this phone: {mb} MB'**
   String audioOnPhone(String mb);
 
   /// No description provided for @downloadAll.
@@ -973,7 +973,7 @@ abstract class AppLocalizations {
   /// No description provided for @confirmDelete.
   ///
   /// In en, this message translates to:
-  /// **'Delete all downloaded audio? Al-Fatiha and Juz 30 stay.'**
+  /// **'Delete the downloaded audio of this reciter? Audio included in the app stays.'**
   String get confirmDelete;
 
   /// No description provided for @cancel.
@@ -1009,7 +1009,7 @@ abstract class AppLocalizations {
   /// No description provided for @sourcesBody.
   ///
   /// In en, this message translates to:
-  /// **'Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Font: Amiri Quran.'**
+  /// **'Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Al-Husary (Muallim) and Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Fonts: Amiri Quran, Amiri, IBM Plex Sans Arabic.'**
   String get sourcesBody;
 
   /// No description provided for @licenses.
@@ -1059,6 +1059,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start'**
   String get start;
+
+  /// No description provided for @wholeSurah.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole surah'**
+  String get wholeSurah;
+
+  /// No description provided for @greeting.
+  ///
+  /// In en, this message translates to:
+  /// **'Assalamu alaykum'**
+  String get greeting;
+
+  /// No description provided for @ayahOfDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayah of the day'**
+  String get ayahOfDay;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @startSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7 short ayahs. The teacher listens and helps.'**
+  String get startSubtitle;
+
+  /// No description provided for @more.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get more;
+
+  /// No description provided for @chooseLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your language'**
+  String get chooseLanguage;
+
+  /// No description provided for @reciterHusary.
+  ///
+  /// In en, this message translates to:
+  /// **'Mahmoud Khalil Al-Husary (teaching)'**
+  String get reciterHusary;
+
+  /// No description provided for @reciterHusaryHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow and exact. A pause after each ayah to repeat. Best to learn.'**
+  String get reciterHusaryHelp;
+
+  /// No description provided for @reciterAlafasyHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Flowing recitation. Downloads per surah.'**
+  String get reciterAlafasyHelp;
+
+  /// No description provided for @bundledNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Al-Fatiha and Juz 30 are included in the app.'**
+  String get bundledNote;
+
+  /// No description provided for @tapWordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a word to hear it. Tap the ayah number for more.'**
+  String get tapWordHint;
+
+  /// No description provided for @reciterHusaryShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Al-Husary (teaching)'**
+  String get reciterHusaryShort;
 }
 
 class _AppLocalizationsDelegate

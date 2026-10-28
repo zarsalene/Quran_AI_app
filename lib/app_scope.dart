@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,26 +11,41 @@ import 'core/settings.dart';
 
 /// The app's long-lived objects.
 class AppServices {
-  AppServices({required this.repo, required this.audio, required this.player, required this.progress, required this.settings});
+  AppServices({required this.repo, required this.audios, required this.player, required this.progress, required this.settings}) {
+    settings.addListener(() => player.setCatalog(audio));
+  }
 
   final QuranRepo repo;
-  final AudioCatalog audio;
+  final Map<Reciter, AudioCatalog> audios;
   final RecitationPlayer player;
+
+  /// The reciter chosen for listening.
+  AudioCatalog get audio => audios[settings.reciter]!;
+
+  /// The clearest recording of [surah] on the phone, for single words: the
+  /// teaching recording first.
+  AudioCatalog? wordAudio(int surah) {
+    for (final c in [audios[Reciter.husaryMuallim]!, audio]) {
+      if (c.isAvailable(surah)) return c;
+    }
+    return null;
+  }
   final ProgressStore progress;
   final Settings settings;
 
   /// Loads everything the first screen needs.
-  static Future<AppServices> create({QuranRepo? repo, AudioCatalog? audio, RecitationPlayer? player}) async {
+  static Future<AppServices> create({QuranRepo? repo, Future<Directory> Function()? storageDir}) async {
     final prefs = await SharedPreferences.getInstance();
     final r = repo ?? QuranRepo();
-    final a = audio ?? AudioCatalog();
-    await Future.wait([r.surahs(), r.meta(), a.load()]);
+    final audios = {for (final x in Reciter.values) x: AudioCatalog(x, storageDir: storageDir)};
+    await Future.wait([r.surahs(), r.meta(), for (final a in audios.values) a.load()]);
+    final settings = Settings(prefs);
     return AppServices(
       repo: r,
-      audio: a,
-      player: player ?? RecitationPlayer(a),
+      audios: audios,
+      player: RecitationPlayer(audios[settings.reciter]!),
       progress: ProgressStore(prefs),
-      settings: Settings(prefs),
+      settings: settings,
     );
   }
 }

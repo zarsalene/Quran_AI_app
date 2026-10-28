@@ -506,7 +506,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String audioOnPhone(String mb) {
-    return 'Al-Fatiha and Juz 30 are included. Downloaded: $mb MB.';
+    return 'Downloaded on this phone: $mb MB';
   }
 
   @override
@@ -528,7 +528,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmDelete =>
-      'Delete all downloaded audio? Al-Fatiha and Juz 30 stay.';
+      'Delete the downloaded audio of this reciter? Audio included in the app stays.';
 
   @override
   String get cancel => 'Cancel';
@@ -548,7 +548,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sourcesBody =>
-      'Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Font: Amiri Quran.';
+      'Quran text: Tanzil.net (Uthmani, verbatim). Recitation: Al-Husary (Muallim) and Mishary Alafasy, via quran.com. Speech model: Quran-Lab (free use only). Fonts: Amiri Quran, Amiri, IBM Plex Sans Arabic.';
 
   @override
   String get licenses => 'Licenses';
@@ -576,4 +576,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get start => 'Start';
+
+  @override
+  String get wholeSurah => 'Whole surah';
+
+  @override
+  String get greeting => 'Assalamu alaykum';
+
+  @override
+  String get ayahOfDay => 'Ayah of the day';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get startSubtitle => '7 short ayahs. The teacher listens and helps.';
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get chooseLanguage => 'Choose your language';
+
+  @override
+  String get reciterHusary => 'Mahmoud Khalil Al-Husary (teaching)';
+
+  @override
+  String get reciterHusaryHelp =>
+      'Slow and exact. A pause after each ayah to repeat. Best to learn.';
+
+  @override
+  String get reciterAlafasyHelp => 'Flowing recitation. Downloads per surah.';
+
+  @override
+  String get bundledNote => 'Al-Fatiha and Juz 30 are included in the app.';
+
+  @override
+  String get tapWordHint =>
+      'Tap a word to hear it. Tap the ayah number for more.';
+
+  @override
+  String get reciterHusaryShort => 'Al-Husary (teaching)';
 }
