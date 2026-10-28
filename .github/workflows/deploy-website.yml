@@ -3,9 +3,6 @@ name: Deploy Rattil website
 on:
   push:
     branches: [main]
-    paths:
-      - 'prototype-pwa/**'
-      - '.github/workflows/deploy-website.yml'
   workflow_dispatch:
 
 permissions:
