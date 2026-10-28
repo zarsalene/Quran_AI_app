@@ -28,7 +28,7 @@ class _MushafScreenState extends State<MushafScreen> {
   late int _page = widget.initialPage;
 
   /// First ayah of [page].
-  AyahRef _start(int page) => _services.repo.metaLoaded.pages[page - 1];
+  AyahRef _start(int page) => _services.meta.pages[page - 1];
 
   @override
   void dispose() {
@@ -41,9 +41,9 @@ class _MushafScreenState extends State<MushafScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final meta = _services.repo.metaLoaded;
+    final meta = _services.meta;
     final start = _start(_page);
-    final info = _services.repo.surahsLoaded[start.surah - 1];
+    final info = _services.surahs[start.surah - 1];
     return Scaffold(
       appBar: AppBar(
         title: Text('${t.pageN(_page)} · ${t.juzN(meta.juzOf(start))}'),
@@ -134,7 +134,7 @@ class _PageState extends State<_Page> {
         final scheme = Theme.of(context).colorScheme;
         final children = <Widget>[];
         for (final (surah, ayahs) in blocks) {
-          final info = s.repo.surahsLoaded[surah.number - 1];
+          final info = s.surahs[surah.number - 1];
           if (ayahs.first.number == 1) {
             children.add(SurahHeader(info: info));
             if (surah.basmala != null) {

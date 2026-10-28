@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
         child: ListenableBuilder(
           listenable: Listenable.merge([s.progress, s.settings]),
           builder: (context, _) {
-            final surahs = s.repo.surahsLoaded;
+            final surahs = s.surahs;
             return ListView(
               padding: const EdgeInsets.only(bottom: 24),
               children: [
@@ -159,7 +159,7 @@ class _ContinueCard extends StatelessWidget {
     final s = AppScope.of(context);
     final last = s.progress.last;
     final scheme = Theme.of(context).colorScheme;
-    final info = s.repo.surahsLoaded[(last?.surah ?? 1) - 1];
+    final info = s.surahs[(last?.surah ?? 1) - 1];
     final title = last == null ? t.startTitle : t.continueTitle;
     final kind = switch (last?.kind) {
       ActivityKind.read => t.actionRead,
@@ -303,10 +303,10 @@ class _AyahOfDay extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppScope.of(context);
     final t = AppLocalizations.of(context);
-    final ref = pick(s.progress.today, s.repo.surahsLoaded);
+    final ref = pick(s.progress.today, s.surahs);
     final scheme = Theme.of(context).colorScheme;
     return FutureBuilder<QSurah>(
-      future: s.repo.surah(ref.surah),
+      future: s.text(ref.surah),
       builder: (context, snap) {
         final surah = snap.data;
         if (surah == null) return const SizedBox(height: 120);
@@ -334,7 +334,7 @@ class _AyahOfDay extends StatelessWidget {
                 Row(children: [
                   Icon(Icons.auto_stories_rounded, size: 16, color: scheme.secondary),
                   const SizedBox(width: 6),
-                  Text('${s.repo.surahsLoaded[ref.surah - 1].name} · ${t.ayahN(ref.ayah)}',
+                  Text('${s.surahs[ref.surah - 1].name} · ${t.ayahN(ref.ayah)}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                 ]),
               ]),

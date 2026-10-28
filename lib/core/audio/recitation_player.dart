@@ -108,7 +108,10 @@ class RecitationPlayer extends ChangeNotifier {
     _rangeActive = true;
     final done = _rangeDone = Completer<void>();
     await _p.setSpeed(speed);
-    await _p.seek(Duration(milliseconds: _catalog.surah(s).ayah(from).start));
+    // Without ayah timings the surah plays as a whole, from its start.
+    final t = _catalog.surah(s);
+    if (t == null) ayah = null;
+    await _p.seek(Duration(milliseconds: t?.ayah(from).start ?? 0));
     notifyListeners();
     unawaited(_p.play());
     return done.future;
@@ -133,7 +136,9 @@ class RecitationPlayer extends ChangeNotifier {
     await stop();
     final cat = from ?? _catalog;
     await _load(s, from: cat);
-    final (start, end) = cat.surah(s).ayah(a).wordSpan(w);
+    final timing = cat.surah(s);
+    if (timing == null || !cat.hasWordTimings) return;
+    final (start, end) = timing.ayah(a).wordSpan(w);
     surah = s;
     ayah = a;
     word = w;
@@ -199,7 +204,9 @@ class RecitationPlayer extends ChangeNotifier {
     if (s == null || !_rangeActive) return;
     ayah = a;
     _played = 0;
-    await _p.seek(Duration(milliseconds: _catalog.surah(s).ayah(a).start));
+    final t = _catalog.surah(s);
+    if (t == null) return;
+    await _p.seek(Duration(milliseconds: t.ayah(a).start));
     notifyListeners();
   }
 
@@ -216,7 +223,9 @@ class RecitationPlayer extends ChangeNotifier {
     final s = surah, a = ayah;
     if (!_rangeActive || s == null || a == null || _seeking || !_p.playing) return;
     final ms = pos.inMilliseconds;
-    final timing = _catalog.surah(s).ayah(a);
+    final surahTiming = _catalog.surah(s);
+    if (surahTiming == null) return;
+    final timing = surahTiming.ayah(a);
     if (ms < timing.to) {
       final w = timing.wordAt(ms);
       if (w != word) {
@@ -232,13 +241,13 @@ class RecitationPlayer extends ChangeNotifier {
     } else if (a < _to) {
       _played = 0;
       ayah = a + 1;
-      final next = _catalog.surah(s).ayah(a + 1);
+      final next = surahTiming.ayah(a + 1);
       // The next ayah usually starts where this one ends. Seek only if not.
       if ((next.start - ms).abs() > 300) _seekTo(next.start);
     } else if (loopRange) {
       _played = 0;
       ayah = _from;
-      _seekTo(_catalog.surah(s).ayah(_from).start);
+      _seekTo(surahTiming.ayah(_from).start);
     } else {
       _p.pause();
       ayah = null;
@@ -261,15 +270,16 @@ class RecitationPlayer extends ChangeNotifier {
     if (st.processingState == ProcessingState.completed && _rangeActive) {
       // The file ended (last ayah of the surah).
       final s = surah;
+      final t = s == null ? null : _catalog.surah(s);
       if (loopRange && s != null) {
         _played = 0;
-        ayah = _from;
-        _seekTo(_catalog.surah(s).ayah(_from).start).then((_) => _p.play());
+        ayah = t == null ? null : _from;
+        _seekTo(t?.ayah(_from).start ?? 0).then((_) => _p.play());
         return;
       }
       _played++;
-      if (_played < repeatEach && s != null && ayah != null) {
-        _seekTo(_catalog.surah(s).ayah(ayah!).start).then((_) => _p.play());
+      if (_played < repeatEach && s != null) {
+        _seekTo(t != null && ayah != null ? t.ayah(ayah!).start : 0).then((_) => _p.play());
         return;
       }
       ayah = null;

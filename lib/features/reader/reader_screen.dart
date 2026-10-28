@@ -33,7 +33,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
   }
 
   Future<void> _load() async {
-    final s = await _services.repo.surah(widget.surah);
+    final s = await _services.text(widget.surah);
     if (!mounted) return;
     setState(() => _surah = s);
     _services.player.addListener(_follow);
@@ -68,7 +68,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final info = _services.repo.surahsLoaded[widget.surah - 1];
+    final info = _services.surahs[widget.surah - 1];
     final surah = _surah;
     return Scaffold(
       appBar: AppBar(
@@ -83,7 +83,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
             tooltip: t.pageView,
             icon: const Icon(Icons.auto_stories),
             onPressed: () {
-              final page = _services.repo.metaLoaded.pageOf((surah: widget.surah, ayah: _firstVisibleAyah()));
+              final page = _services.meta.pageOf((surah: widget.surah, ayah: _firstVisibleAyah()));
               _services.settings.pageView = true;
               Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => MushafScreen(initialPage: page)));
             },

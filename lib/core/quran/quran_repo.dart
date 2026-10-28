@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+import 'riwaya.dart';
+
 /// One word as shown, with its expected phonemes.
 class QWord {
   const QWord({required this.text, this.mark, required this.phonemes, this.variants = const []});
@@ -94,6 +96,10 @@ class QuranMeta {
     return QuranMeta._(refs('pages'), refs('juz'), refs('quarters'), refs('sajdas').toSet());
   }
 
+  /// Pages and juz of another riwaya's mushaf (no quarters or sajdahs).
+  factory QuranMeta.of({required List<AyahRef> pages, required List<AyahRef> juz}) =>
+      QuranMeta._(pages, juz, const [], const {});
+
   /// Start of each page (604), juz (30) and hizb quarter (240), in order.
   final List<AyahRef> pages;
   final List<AyahRef> juz;
@@ -114,6 +120,8 @@ class QuranMeta {
     return lo + 1;
   }
 
+  int get pageCount => pages.length;
+
   int pageOf(AyahRef ref) => _find(pages, ref);
   int juzOf(AyahRef ref) => _find(juz, ref);
   int quarterOf(AyahRef ref) => _find(quarters, ref);
@@ -126,6 +134,34 @@ class QuranRepo {
   final AssetBundle _bundle;
   List<SurahInfo>? _index;
   QuranMeta? _meta;
+  final Map<Riwaya, RiwayaText> _riwayat = {};
+  final Map<Riwaya, List<SurahInfo>> _infos = {};
+
+  /// Loads the text of [r] once (Hafs is always loaded).
+  Future<void> loadRiwaya(Riwaya r) async {
+    if (r.asset == null || _riwayat.containsKey(r)) return;
+    _riwayat[r] = await RiwayaText.load(r, _bundle);
+  }
+
+  bool isLoaded(Riwaya r) => r.asset == null || _riwayat.containsKey(r);
+
+  /// Surahs with the ayah count of [r], after [loadRiwaya].
+  List<SurahInfo> infosFor(Riwaya r) {
+    final text = _riwayat[r];
+    if (text == null) return surahsLoaded;
+    return _infos[r] ??= [
+      for (final i in surahsLoaded)
+        SurahInfo(number: i.number, name: i.name, tname: i.tname, ename: i.ename, ayahs: text.ayahCount(i.number), meccan: i.meccan),
+    ];
+  }
+
+  QuranMeta metaFor(Riwaya r) => _riwayat[r]?.meta ?? metaLoaded;
+
+  /// Surah [n] in riwaya [r]. Hafs words carry the teacher's phonemes.
+  Future<QSurah> surahFor(Riwaya r, int n) async {
+    final text = _riwayat[r];
+    return text == null ? surah(n) : text.surah(n);
+  }
   final Map<int, QSurah> _cache = {};
 
   Future<List<SurahInfo>> surahs() async {

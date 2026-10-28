@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'align/session.dart';
-import 'audio/audio_catalog.dart';
+import 'quran/riwaya.dart';
 
 /// User settings, saved on the phone.
 class Settings extends ChangeNotifier {
@@ -34,11 +34,17 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Reciter for listening. The teacher always plays words with the
-  /// teaching recording when it is on the phone.
-  Reciter get reciter => Reciter.values.firstWhere((r) => r.name == _prefs.getString('reciter'),
-      orElse: () => Reciter.husaryMuallim);
-  set reciter(Reciter v) => _set('reciter', v.name);
+  /// The riwaya the user reads and listens to.
+  Riwaya get riwaya => Riwaya.values.firstWhere((r) => r.name == _prefs.getString('riwaya'), orElse: () => Riwaya.hafs);
+  set riwaya(Riwaya v) => _set('riwaya', v.name);
+
+  /// The chosen reciter id of riwaya [r], or null.
+  String? reciterIdFor(Riwaya r) => _prefs.getString('reciter.${r.name}');
+  void setReciterFor(Riwaya r, String id) => _set('reciter.${r.name}', id);
+
+  /// The learner's first name, for the greeting (kept on the phone only).
+  String get userName => _prefs.getString('userName') ?? '';
+  set userName(String v) => _set('userName', v.trim());
 
   bool get onboarded => _prefs.getBool('onboarded') ?? false;
   set onboarded(bool v) {

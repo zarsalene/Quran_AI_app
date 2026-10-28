@@ -58,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             // Preview: Al-Fatiha 1:1 from the verified data, never typed here.
             child: FutureBuilder(
-              future: s.repo.surah(1),
+              future: s.text(1),
               builder: (context, snap) => Text(
                 snap.data?.ayahs.first.words.map((w) => w.text).join(' ') ?? '',
                 textAlign: TextAlign.center,

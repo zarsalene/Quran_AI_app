@@ -58,7 +58,7 @@ class _SurahList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surahs = AppScope.of(context).repo.surahsLoaded;
+    final surahs = AppScope.of(context).surahs;
     return ListenableBuilder(
       listenable: AppScope.of(context).progress,
       builder: (context, _) => ListView.builder(
@@ -114,8 +114,8 @@ class _Bookmarks extends StatelessWidget {
           for (final r in list)
             ListTile(
               leading: const Icon(Icons.bookmark),
-              title: Text(s.repo.surahsLoaded[r.surah - 1].name, style: const TextStyle(fontSize: 20)),
-              subtitle: Text('${t.ayahN(r.ayah)} · ${t.pageN(s.repo.metaLoaded.pageOf(r))}'),
+              title: Text(s.surahs[r.surah - 1].name, style: const TextStyle(fontSize: 20)),
+              subtitle: Text('${t.ayahN(r.ayah)} · ${t.pageN(s.meta.pageOf(r))}'),
               onTap: () => openRead(context, r.surah, ayah: r.ayah),
             ),
         ]);
@@ -192,7 +192,7 @@ class SurahPickerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context);
-    final surahs = AppScope.of(context).repo.surahsLoaded;
+    final surahs = AppScope.of(context).surahs;
     final order = [...starterSurahs, for (var s = 2; s <= 77; s++) s];
     void go(SurahInfo info) {
       if (action == SurahAction.read) {

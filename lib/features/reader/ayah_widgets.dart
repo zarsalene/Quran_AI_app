@@ -76,7 +76,7 @@ Future<void> showAyahActions(BuildContext context, int surah, int ayah, {require
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('${s.repo.surahsLoaded[surah - 1].name} · ${t.ayahN(ayah)}', style: Theme.of(ctx).textTheme.titleMedium),
+            Text('${s.surahs[surah - 1].name} · ${t.ayahN(ayah)}', style: Theme.of(ctx).textTheme.titleMedium),
             if (hasAudio) ...[
               ListTile(
                 leading: const Icon(Icons.play_arrow),

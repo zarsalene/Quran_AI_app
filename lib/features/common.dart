@@ -40,7 +40,7 @@ enum SurahAction { read, recite, memorize }
 /// Opens the reader in the view the user chose last (pages or list).
 void openRead(BuildContext context, int surah, {int ayah = 1}) {
   final s = AppScope.of(context);
-  final page = s.repo.metaLoaded.pageOf((surah: surah, ayah: ayah));
+  final page = s.meta.pageOf((surah: surah, ayah: ayah));
   Navigator.of(context).push(MaterialPageRoute<void>(
     builder: (_) => s.settings.pageView ? MushafScreen(initialPage: page) : ReaderScreen(surah: surah, initialAyah: ayah),
   ));
