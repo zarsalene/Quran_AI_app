@@ -14,4 +14,4 @@ const server = http.createServer((req,res)=>{
   });
 });
 const port = Number(process.env.PORT || 4173);
-server.listen(port,'127.0.0.1',()=>console.log(`Iqra prototype running at http://127.0.0.1:${port}`));
+server.listen(port,'127.0.0.1',()=>console.log(`Rattil download website running at http://127.0.0.1:${port}`));

@@ -1,8 +1,8 @@
 {
-  "name": "iqra-quran-learning-prototype",
-  "version": "0.1.0",
+  "name": "rattil-download-website",
+  "version": "1.0.0",
   "private": true,
-  "description": "Offline-capable mobile web prototype for a careful Quran learning app",
+  "description": "Static trilingual download website for the Rattil Android Quran learning app",
   "scripts": {
     "start": "node server.js",
     "test": "node --test"
