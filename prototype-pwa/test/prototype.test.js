@@ -13,6 +13,7 @@ test('landing page contains real Rattil identity and direct release links', () =
   assert.match(html, /rel="icon"/);
   assert.match(html, /name="description"/);
   assert.match(html, /property="og:title"/);
+  assert.match(html, /property="og:image" content="https:\/\/raw\.githubusercontent\.com\/zarsalene\/Quran_AI_app\/main\/assets\/brand\/rattil_icon\.svg"/);
   assert.equal((html.match(/releases\/latest\/download\/Rattil\.apk/g) || []).length, 4);
   assert.match(html, /privacy\.html/);
   assert.match(html, /https:\/\/github\.com\/zarsalene\/Quran_AI_app/);
@@ -93,7 +94,7 @@ test('static hosting includes responsive styles, visible keyboard focus, and loc
   assert.match(css, /focus-visible/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /assets\/fonts\/IBMPlexSansArabic-Regular\.ttf/);
-  for (const file of ['assets/brand/rattil_mark_green.svg', 'assets/brand/rattil_mark_white.svg', 'assets/brand/rattil_icon.svg', 'assets/fonts/IBMPlexSansArabic-Regular.ttf', 'assets/fonts/Amiri-Bold.ttf']) {
+  for (const file of ['assets/brand/rattil_mark_green.svg', 'assets/brand/rattil_mark_white.svg', 'assets/brand/rattil_icon.svg', 'assets/fonts/IBMPlexSansArabic-Regular.ttf', 'assets/fonts/AmiriQuran-Regular.ttf']) {
     assert.ok(fs.statSync(path.join(root, file)).size > 0, `${file} should exist`);
   }
   assert.doesNotMatch(read('index.html'), /fonts\.googleapis\.com|fonts\.gstatic\.com/);

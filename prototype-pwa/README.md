@@ -19,9 +19,11 @@ This is a static site; no build step, backend, database, or environment variable
 ### GitHub Pages
 
 1. Push the repository to GitHub.
-2. In the repository, open **Settings → Pages**.
-3. Select **Deploy from a branch**, choose the branch and the `/prototype-pwa` folder if available as a publishing source. If the Pages UI cannot select that subfolder, publish the contents of `prototype-pwa` from a dedicated branch or configure a GitHub Actions Pages workflow to upload this directory.
+2. In the repository, open **Settings → Pages** and set the source to **GitHub Actions**.
+3. Push a change under `prototype-pwa/` to `main`, or run **Deploy Rattil website** from the Actions tab.
 4. Open the generated site URL and check the APK and privacy links.
+
+The repository includes `.github/workflows/deploy-website.yml`, which publishes the contents of this folder when it changes on `main`.
 
 ### Cloudflare Pages
 
